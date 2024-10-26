@@ -1,0 +1,17 @@
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.log
+*.out
+*.pdf
+*.pytxcode
+*.run.xml
+*.toc
+.venv
+_region_.tex
+outputs
+pythontex-files-*
+tmp
+__pycache__
+_codebraid
