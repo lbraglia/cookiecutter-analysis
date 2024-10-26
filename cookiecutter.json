@@ -1,0 +1,6 @@
+{
+    "project_name": "Test python analysis project",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_') }}",
+    "author": "Luca Braglia"
+    
+}
