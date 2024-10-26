@@ -2,6 +2,6 @@
     "customer_surname": "braglia",
     "prj_acronym": "test",
     "prj_title" : "Project title.",
-    "project_slug": "{{ cookiecutter.customer_surname.lower().replace(' ', '_') + "_" + cookiecutter.prj_acronym.lower().replace(' ', '_') }}",
-    "project_repo": "{{ 'prj' + str(datetime.date.today().year - 2000) + "_" + cookiecutter.project_slug  }}"
+    "project_slug": "{{ cookiecutter.customer_surname.lower().replace(' ', '_') + '_' + cookiecutter.prj_acronym.lower().replace(' ', '_') }}",
+    "project_repo": "{{ 'prj' + str(datetime.date.today().year - 2000) + '_' + cookiecutter.project_slug  }}"
 }
