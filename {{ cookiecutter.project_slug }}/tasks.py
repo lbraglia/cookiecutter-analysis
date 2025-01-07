@@ -255,6 +255,7 @@ def init(c):
     # -----------------------------------------------------------
     print("UV init")
     subprocess.run(["uv", "init", "."])
+    subprocess.run(["rm", "-rf", "hello.py"])
     # print("Metadata setup")
     # metadata = {
     #     "customer": customer,
