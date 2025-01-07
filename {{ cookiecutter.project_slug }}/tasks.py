@@ -14,9 +14,6 @@ from tkinter.filedialog import askopenfilename
 TESTING = True
 
 # ----------------------------------------------- Parameters
-# sys infos
-oggi = date.today()
-
 # external programs
 editor = "emacs --no-splash -r -fh"
 pdf_viewer = "okular --unique"
@@ -34,31 +31,6 @@ default_requirements = [
 
 # project snake paths
 ini_file = Path("~/.project_snake.ini").expanduser()
-psnake_dir = Path("project_snake")
-psnake_template_dir = psnake_dir / "templates"
-psnake_template_biblio = psnake_dir / "templates" / "biblio.bib"
-psnake_template_gitignore = psnake_dir / "templates" / "gitignore"
-psnake_template_texfiles = psnake_template_dir.glob("*.tex")
-psnake_template_pyfiles = psnake_template_dir.glob("*.py")
-
-
-# project standard directory and path generators
-def prj_subdirs(prj):
-    subdirs = (
-        "tmp",
-        "data",
-        "outputs",
-        "proj",
-        "proj/biblio",
-        "proj/docs",
-        "proj/docs/revisione_protocollo",
-        "proj/docs/revisione_articolo",
-        "proj/docs/letteratura",
-        "src",
-    )
-    return [prj.joinpath(sd) for sd in subdirs]
-
-
 
 def prj_report(prj):
     return prj / "report.pdf"
@@ -256,23 +228,12 @@ def init(c):
     print("UV init")
     subprocess.run(["uv", "init", "."])
     subprocess.run(["rm", "-rf", "hello.py"])
-    # print("Metadata setup")
-    # metadata = {
-    #     "customer": customer,
-    #     "acronym": acronym,
-    #     "title": title,
-    #     "created": created,
-    #     "url": url,
-    # }
-    # metadata_file = prj_metadata(prj)
-    # configs = configparser.ConfigParser()
-    # configs["project"] = metadata
-    # with open(metadata_file, "w") as f:
-    #     configs.write(f)
-    # # -----------------------------------------------------------
     # print("Git setup")
-    # cmd = f"git init -b master && git remote add origin {url} && git add . && git commit -m 'Directory setup'"
-    # os.system(cmd)
+    proj_info = configparser.ConfigParser()
+    proj_info.read("proj/info.ini")
+    proj_url = proj_info["project"]["url"]
+    cmd = f"git init -b master && git remote add origin {proj_url} && git add . && git commit -m 'Directory setup'"
+    os.system(cmd)
     # -----------------------------------------------------------
     return None
 
