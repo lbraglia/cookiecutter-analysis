@@ -229,7 +229,7 @@ help_repo = "Repository bitbucket da clonare."
 
 
 @task(help={"prj": help_prj})
-def clean(c, prj=get_default_prj()):
+def clean(c, prj="."):
     """
     Pulisce la directory del progetto.
     """
@@ -277,7 +277,7 @@ def init(c):
 
 
 @task(help={"prj": help_prj})
-def dataimp(c, prj=get_default_prj()):
+def dataimp(c, prj="."):
     """
     Importa il dataset nella directory del progetto.
     """
@@ -285,7 +285,7 @@ def dataimp(c, prj=get_default_prj()):
 
 
 @task(help={"prj": help_prj})
-def protimp(c, prj=get_default_prj()):
+def protimp(c, prj="."):
     """
     Importa il protocollo nella directory del progetto.
     """
@@ -293,7 +293,7 @@ def protimp(c, prj=get_default_prj()):
 
 
 @task(help={"prj": help_prj})
-def venvrepl(c, prj=get_default_prj()):
+def venvrepl(c, prj="."):
     """
     Usa l'environment del progetto in maniera interattiva.
     """
@@ -301,7 +301,7 @@ def venvrepl(c, prj=get_default_prj()):
 
 
 @task(help={"prj": help_prj})
-def venvsetup(c, prj=get_default_prj()):
+def venvsetup(c, prj="."):
     """
     Crea (o azzera) il virtual environment e installa i requirements.txt
     """
@@ -309,7 +309,7 @@ def venvsetup(c, prj=get_default_prj()):
 
 
 @task(help={"prj": help_prj})
-def venvfreeze(c, prj=get_default_prj()):
+def venvfreeze(c, prj="."):
     """
     A fine progetto fai il freeze dei requirements per riproducibilità.
     """
@@ -317,7 +317,7 @@ def venvfreeze(c, prj=get_default_prj()):
 
 
 @task(help={"prj": help_prj})
-def viewdoc(c, prj=get_default_prj()):
+def viewdoc(c, prj="."):
     """
     Mostra la documentazione del progetto (file proj/docs/*.pdf).
     """
@@ -326,7 +326,7 @@ def viewdoc(c, prj=get_default_prj()):
 
 
 @task(default=True, help={"prj": help_prj})
-def edit(c, prj=get_default_prj()):
+def edit(c, prj="."):
     """
     Edita i file rilevanti del progetto con Emacs.
     """
@@ -341,7 +341,7 @@ def edit(c, prj=get_default_prj()):
     # subprocess.Popen(cmd.split(" ")) # niente fixa
 
 @task(help={"prj": help_prj})
-def vscode(c, prj=get_default_prj()):
+def vscode(c, prj="."):
     """
     Edita la cartella con Codium (vscode).
     """
@@ -349,7 +349,7 @@ def vscode(c, prj=get_default_prj()):
 
 
 @task(help={"prj": help_prj})
-def runpys(c, prj=get_default_prj()):
+def runpys(c, prj="."):
     """
     Esegue i file src/*.py nella directory radice del progetto.
     """
@@ -362,7 +362,7 @@ def runpys(c, prj=get_default_prj()):
                                                py.relative_to(prj)))
 
 @task(help={"prj": help_prj})
-def runrs(c, prj=get_default_prj()):
+def runrs(c, prj="."):
     """
     Esegue i file src/*.R nella directory radice del progetto e ne salva l'output in
     tmp
@@ -383,7 +383,7 @@ def runrs(c, prj=get_default_prj()):
 
 
 @task(help={"prj": help_prj})
-def report(c, prj=get_default_prj()):
+def report(c, prj="."):
     """
     Esegue pdflatex/pythontex su src/report.tex nella directory radice del progetto e visualizza il pdf.
     """
@@ -403,7 +403,7 @@ def report(c, prj=get_default_prj()):
 
    
 @task(help={"prj": help_prj})
-def zip(c, prj=get_default_prj()):
+def zip(c, prj="."):
     """
     Zippa il report.pdf e i file in prj/outputs per l'invio.
     """
@@ -419,7 +419,7 @@ def zip(c, prj=get_default_prj()):
 
    
 @task(help={"prj": help_prj})
-def tgrep(c, prj=get_default_prj()):
+def tgrep(c, prj="."):
     """
     Invia il report.pdf via telegram nella chat lavoro.
     """
@@ -430,7 +430,7 @@ def tgrep(c, prj=get_default_prj()):
 
 
 @task(help={"prj": help_prj})
-def tgout(c, prj=get_default_prj()):
+def tgout(c, prj="."):
     """
     Invia gli allegati nella cartella outputs via telegram nella chat lavoro.
     """
@@ -444,7 +444,7 @@ def tgout(c, prj=get_default_prj()):
 
 
 @task(help={"prj": help_prj})
-def tgzip(c, prj=get_default_prj()):
+def tgzip(c, prj="."):
     """
     Invia il malloppone zippato via telegram nella chat lavoro
     """
@@ -454,7 +454,7 @@ def tgzip(c, prj=get_default_prj()):
     c.run("winston_sends {} group::lavoro".format(zip))
 
 # @task(help={"prj": help_prj})
-# def lint(c, prj=get_default_prj()):
+# def lint(c, prj="."):
 #     """
 #     Esegue il linter (flake8) nella cartella src.
 #     """
@@ -462,7 +462,7 @@ def tgzip(c, prj=get_default_prj()):
 
 
 # @task(help={"prj": help_prj})
-# def mypy(c, prj=get_default_prj()):
+# def mypy(c, prj="."):
 #     """
 #     Esegue mypy nella cartella src del progetto.
 #     """
@@ -470,7 +470,7 @@ def tgzip(c, prj=get_default_prj()):
 
 
 # @task(help={"prj": help_prj})
-# def format(c, prj=get_default_prj()):
+# def format(c, prj="."):
 #     """
 #     Esegue il formatter (black) nella cartella src.
 #     """
