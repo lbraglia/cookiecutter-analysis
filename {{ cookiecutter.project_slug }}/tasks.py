@@ -160,50 +160,6 @@ def prj_python(prj):
     return prj_venv(prj) / "bin" / "python"
 
 
-# ------------------------------------------------ Utils
-def get_default_prj():
-    """
-    get default prj from .project_snake.ini
-    """
-    configs = configparser.ConfigParser()
-    configs.read(ini_file)
-    return Path(configs["default"]["prj"])
-
-
-def set_default_prj(prj):
-    """
-    set prj as default in .project_snake.ini
-    """
-    configs = configparser.ConfigParser()
-    configs.read(ini_file)
-    configs["default"]["prj"] = str(prj)
-    with open(ini_file, "w") as configfile:
-        configs.write(configfile)
-
-
-def add_missing_dirs(prj):
-    """
-    Create missing dir in a prj directory
-    """
-    subdirs_paths = prj_subdirs(prj)
-    for subdir in subdirs_paths:
-        if TESTING:
-            print(subdir)
-        if not subdir.exists():
-            subdir.mkdir()
-
-
-def setup_venv(prj):
-    """
-    Create (or refresh) the virtual environment and install requirements.txt
-    """
-    venv = prj_venv(prj)
-    if venv.exists():
-        shutil.rmtree(venv)
-    subprocess.run(["python", "-m", "venv", venv])
-    cmd = "{0} -m pip install -r {1}".format(prj_python(prj), prj_requirements(prj))
-    os.system(cmd)
-
 
 def freeze_venv(prj):
     """
@@ -281,116 +237,41 @@ def clean(c, prj=get_default_prj()):
 
 
 @task
-def getprj(c):
+def init(c):
     """
-    Restituisce il progetto di default.
-    """
-    print(get_default_prj())
-
-
-@task(help={"prj": help_prj})
-def setprj(c, prj):
-    """
-    Imposta il progetto di default.
-    """
-    set_default_prj(prj)
-
-
-@task(help={"repo": help_repo})
-def clone(c, repo):
-    """
-    Effettua il clone/download da bitbucket (ad esempio 'inv clone prj23_test_test' salva come test_test).
-    """
-    prj = Path(repo.partition("_")[2])
-    clone_cmd = "git clone https://lbraglia@bitbucket.org/lbraglia/{0} {1}".format(
-        repo, prj
-    )
-    c.run(clone_cmd)
-    set_default_prj(prj)
-    add_missing_dirs(prj)
-    setup_venv(prj)
-
-
-@task
-def create(c):
-    """
-    Crea un nuovo progetto.
+    Inizializza un nuovo progetto parzialmente creato da cookiecutter
     """
     # ------------------------------------------------------------
-    customer = input("Customer (surname): ")
-    customer = "test" if (TESTING and customer == "") else customer
-    acronym = input("PRJ acronym: ")
-    acronym = "test" if (TESTING  and acronym == "") else acronym
-    title = input("PRJ title: ")
-    prj = Path("{0}_{1}".format(customer, acronym))
-    repo = "prj{0}_{1}_{2}".format(str(oggi.year - 2000), customer, acronym)
-    url = "https://lbraglia@bitbucket.org/lbraglia/{0}.git".format(repo)
-    created = oggi.isoformat()
-    # ------------------------------------------------------------
-    print("Project directories setup")
-    if TESTING and prj.exists():
-        shutil.rmtree(prj)
-    prj.mkdir()
-    add_missing_dirs(prj)
-    # ------------------------------------------------------------
-    print("README and requirements.txt setup")
-    readme_content = [
-        "<!-- -*- mode: markdown -*- -->",
-        "# {0}\n".format(prj),
-        "## Description\n\n",
-        "## TODO\n\n",
-    ]
-    with open(prj_readme(prj), "w") as f:
-        print("\n".join(readme_content), file=f)
-    with open(prj_requirements(prj), "w") as f:
-        print("\n".join(default_requirements), file=f)
-    edit_cmd = "{0} {1} {2}".format(
-        editor, str(prj_requirements(prj)), str(prj_readme(prj))
-    )
-    subprocess.run(edit_cmd.split(" "))
-    # ------------------------------------------------------------
-    print("Template setup")
-    for tex in psnake_template_texfiles:
-        shutil.copy(tex, prj_src_dir(prj))
-    for py in psnake_template_pyfiles:
-        shutil.copy(py, prj_src_dir(prj))
-    shutil.copy(psnake_template_gitignore, prj_gitignore(prj))
-    # -----------------------------------------------------------
     print("Bibliography setup")
-    os.symlink(
-        os.path.abspath(psnake_template_biblio), os.path.abspath(prj_biblio_common(prj))
-    )
-    subprocess.run(["touch", prj_biblio_specific(prj)])
+    os.symlink("/home/l/texmf/tex/latex/biblio/biblio.bib",
+               os.path.abspath("proj/biblio/common_biblio.bib"))
+    subprocess.run(["touch", "proj/biblio/prj_biblio.bib"])
     # -----------------------------------------------------------
     print("Importing protocol")
-    import_protocol(prj)
+    import_protocol(".")
     # -----------------------------------------------------------
     print("Importing dataset")
-    import_data(prj)
+    import_data(".")
     # -----------------------------------------------------------
-    print("Virtual environment setup")
-    setup_venv(prj)
-    # -----------------------------------------------------------
-    print("Metadata setup")
-    metadata = {
-        "customer": customer,
-        "acronym": acronym,
-        "title": title,
-        "created": created,
-        "url": url,
-    }
-    metadata_file = prj_metadata(prj)
-    configs = configparser.ConfigParser()
-    configs["project"] = metadata
-    with open(metadata_file, "w") as f:
-        configs.write(f)
-    # -----------------------------------------------------------
-    print("Setting as default project")
-    set_default_prj(prj)
-    # -----------------------------------------------------------
-    print("Git setup")
-    cmd = f"git init -b master && git remote add origin {url} && git add . && git commit -m 'Directory setup'"
-    os.system(cmd)
+    print("UV init")
+    subprocess.run(["uv", "init", "."])
+    # print("Metadata setup")
+    # metadata = {
+    #     "customer": customer,
+    #     "acronym": acronym,
+    #     "title": title,
+    #     "created": created,
+    #     "url": url,
+    # }
+    # metadata_file = prj_metadata(prj)
+    # configs = configparser.ConfigParser()
+    # configs["project"] = metadata
+    # with open(metadata_file, "w") as f:
+    #     configs.write(f)
+    # # -----------------------------------------------------------
+    # print("Git setup")
+    # cmd = f"git init -b master && git remote add origin {url} && git add . && git commit -m 'Directory setup'"
+    # os.system(cmd)
     # -----------------------------------------------------------
     return None
 
