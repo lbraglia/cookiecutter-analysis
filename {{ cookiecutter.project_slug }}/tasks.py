@@ -7,7 +7,6 @@ import pylbmisc as lb
 
 from pathlib import Path
 from zipfile import ZipFile
-from datetime import date
 from invoke import task
 from tkinter.filedialog import askopenfilename
 
@@ -19,25 +18,9 @@ editor = "emacs --no-splash -r -fh"
 pdf_viewer = "okular --unique"
 clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *.bcf *.blg *.run.xml *.out *.Rnw"
 
-# default lines for requirements.txt
-default_requirements = [
-    "# matplotlib",
-    "# scipy",
-    "# statsmodels",
-    "# tableone",
-    "pandas",
-    "pylbmisc @ file:///home/l/.src/pypkg/pylbmisc",
-]
-
-# project snake paths
-ini_file = Path("~/.project_snake.ini").expanduser()
 
 def prj_report(prj):
     return prj / "report.pdf"
-
-
-def prj_gitignore(prj):
-    return prj / ".gitignore"
 
 
 def prj_tmp_dir(prj):
@@ -95,20 +78,10 @@ def prj_protocol_link(prj):
     return prj / "proj" / "docs" / "protocol.pdf"
 
 
-def prj_src_dir(prj):
-    return prj / "src"
+# def prj_src_dir(prj):
+#     return prj / "src"
 
 
-def prj_srcfiles(prj):
-    src_dir = prj_src_dir(prj)
-    py = list(src_dir.glob("*.py"))
-    tex = list(src_dir.glob("*.tex"))
-    return py + tex
-
-
-def prj_dontedit(prj):
-    return [prj_src_dir(prj) / "__init__.py",
-            prj_src_dir(prj) / "_region_.tex"] 
 
 
 def prj_srcpys(prj):
@@ -228,7 +201,12 @@ def init(c):
     print("UV init")
     subprocess.run(["uv", "init", "."])
     subprocess.run(["rm", "-rf", "hello.py"])
-    # print("Git setup")
+    default_requirements = [
+        "pandas",
+        "file:///home/l/.src/pypkg/pylbmisc"
+    ]
+    subprocess.run(["uv", "add"] + default_requirements)
+    # adding the remote for git
     proj_info = configparser.ConfigParser()
     proj_info.read("proj/info.ini")
     proj_url = proj_info["project"]["url"]
@@ -259,23 +237,16 @@ def venvrepl(c, prj="."):
     """
     Usa l'environment del progetto in maniera interattiva.
     """
-    os.system(prj_python(prj))
+    os.system("uv run python -i")
 
 
-@task(help={"prj": help_prj})
-def venvsetup(c, prj="."):
-    """
-    Crea (o azzera) il virtual environment e installa i requirements.txt
-    """
-    setup_venv(prj)
 
-
-@task(help={"prj": help_prj})
-def venvfreeze(c, prj="."):
-    """
-    A fine progetto fai il freeze dei requirements per riproducibilità.
-    """
-    freeze_venv(prj)
+# @task(help={"prj": help_prj})
+# def venvfreeze(c, prj="."):
+#     """
+#     A fine progetto fai il freeze dei requirements per riproducibilità.
+#     """
+#     freeze_venv(prj)
 
 
 @task(help={"prj": help_prj})
@@ -283,7 +254,7 @@ def viewdoc(c, prj="."):
     """
     Mostra la documentazione del progetto (file proj/docs/*.pdf).
     """
-    cmd = "{0} {1}/proj/docs/*.pdf".format(pdf_viewer, prj)
+    cmd = f"{pdf_viewer} proj/docs/*/*.pdf"
     c.run(cmd)
 
 
@@ -292,22 +263,25 @@ def edit(c, prj="."):
     """
     Edita i file rilevanti del progetto con Emacs.
     """
-    # evita __init__.py nel buffer di emacs
-    dontedit = prj_dontedit(prj)
-    src_edit = [f for f in prj_srcfiles(prj) if f not in dontedit]
-    proj_files = [prj_readme(prj), prj_requirements(prj)]
-    all_files = proj_files + src_edit
-    relative_paths = " ".join([str(f.relative_to(prj)) for f in all_files])
-    cmd = "cd {0} && {1} {2} &".format(prj, editor, relative_paths) # niente da fare
+    src_dir = Path("src")
+    py = list(src_dir.glob("*.py"))
+    tex = list(src_dir.glob("*.tex"))
+    r = list(src_dir.glob("*.R"))
+    rnw = list(src_dir.glob("*.Rnw"))
+    edit_files =  py + tex + r + rnw
+    ignore = [src_dir / "src/__init__.py", src_dir / "src/_region_.tex"] 
+    all_files = [f for f in edit_files if f not in ignore]
+    relative_paths = " ".join([str(f.relative_to(".")) for f in all_files])
+    cmd = f"{editor} {relative_paths} &"
     c.run(cmd)
-    # subprocess.Popen(cmd.split(" ")) # niente fixa
 
-@task(help={"prj": help_prj})
-def vscode(c, prj="."):
-    """
-    Edita la cartella con Codium (vscode).
-    """
-    c.run("codium {0}".format(prj))
+
+# @task(help={"prj": help_prj})
+# def vscode(c, prj="."):
+#     """
+#     Edita la cartella con Codium (vscode).
+#     """
+#     c.run("codium {0}".format(prj))
 
 
 @task(help={"prj": help_prj})
@@ -333,8 +307,8 @@ def runrs(c, prj="."):
     if rs:
         for r in rs:
             infile = r
-            outfile = prj_tmp_dir(prj) / (str(r.stem) + ".txt")
-            # outfile = Path("tmp") / (str(r.stem) + ".txt")
+            # outfile = prj_tmp_dir(prj) / (str(r.stem) + ".txt")
+            outfile = Path("tmp") / (str(r.stem) + ".txt")
             print("Executing {0} (output in {1})".format(infile, outfile))
             cmd = "cd {0} && R CMD BATCH --no-save --no-restore {1} {2}".format(
                 prj,
@@ -413,7 +387,7 @@ def tgzip(c, prj="."):
     zip = Path("/tmp/{0}.zip".format(prj))
     if not zip.exists():
         raise ValueError("Non esiste {}.".format(zip))
-    c.run("winston_sends {} group::lavoro".format(zip))
+    c.run(f"winston_sends {zip} group::lavoro")
 
 # @task(help={"prj": help_prj})
 # def lint(c, prj="."):

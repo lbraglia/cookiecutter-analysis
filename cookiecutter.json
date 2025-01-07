@@ -3,6 +3,6 @@
     "project_acronym": "test",
     "project_title" : "Project title.",
     "project_slug": "{{cookiecutter.customer_surname.lower().replace(' ', '_')}}_{{cookiecutter.project_acronym.lower().replace(' ', '_')}}",
-    "project_repo": "prj{% now 'utc', '%y' %}_{{cookiecutter.project_slug}}",
-    "project_created": "{% now 'utc', '%Y-%m-%d' %}"
+    "project_created": "{% now 'utc', '%Y-%m-%d' %}",
+    "project_repo": "prj{% now 'utc', '%y' %}_{{cookiecutter.project_slug}}"
 }
