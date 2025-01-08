@@ -10,8 +10,6 @@ from zipfile import ZipFile
 from invoke import task
 from tkinter.filedialog import askopenfilename
 
-TESTING = True
-
 # ----------------------------------------------- Parameters
 # external programs
 editor = "emacs --no-splash -r -fh"
@@ -48,7 +46,7 @@ prj_protocol_link   =  prj / "proj" / "docs" / "protocol.pdf"
 
 def import_data():
     """
-    import dataset as a and set up useful symlinks
+    Import latest dataset and set up proper symlinks.
     """
     dataset_date = input(
         "Insert date of the data extraction (YYYY-MM-DD) or leave blank to skip: "
@@ -74,7 +72,7 @@ def import_data():
 
 def import_protocol():
     """
-    import protocol with date and set up useful symlinks
+    Import latest protocol and set up proper symlinks
     """
     msg = "Insert date of the study protocol (YYYY-MM-DD) or leave blank to skip: "
     protocol_date = input(msg).replace("-", "_")
@@ -96,7 +94,6 @@ def import_protocol():
         if symlink.exists():
             symlink.unlink()
         symlink.symlink_to(outfile.absolute())
-
 
 
 @task
@@ -154,15 +151,30 @@ def protimp(c):
     import_protocol()
 
 
-
+@task
+def viewprot(c):
+    """
+    Mostra il protocollo ultima versione.
+    """
+    cmd = f"{pdf_viewer} proj/docs/protocol.pdf &"
+    os.system(cmd)
 
 
 @task
-def viewdoc(c):
+def viewlit(c):
     """
-    Mostra la documentazione del progetto (file proj/docs/*.pdf).
+    Mostra la letteratura del progetto.
     """
-    cmd = f"{pdf_viewer} proj/docs/*/*.pdf &"
+    cmd = f"{pdf_viewer} proj/docs/letteratura/*.pdf &"
+    os.system(cmd)
+
+
+@task
+def viewcrf(c):
+    """
+    Mostra le crf del progetto.
+    """
+    cmd = f"{pdf_viewer} proj/docs/crf/*.pdf &"
     os.system(cmd)
 
 
@@ -189,14 +201,6 @@ def edit(c):
     os.system(cmd)
 
 
-# @task
-# def vscode(c):
-#     """
-#     Edita la cartella con Codium (vscode).
-#     """
-#     c.run("codium {0}".format(prj))
-
-
 @task
 def repl(c):
     """
@@ -210,13 +214,16 @@ def runpys(c):
     """
     Esegue i file src/*.py nella directory radice del progetto.
     """
-    pys = prj_srcpys(prj)
+    # pys = prj_srcpys(prj)
+    pys = prj_src_dir.glob("*.py")
     if pys:
         for py in pys:
-            print("Executing {0}.".format(py))
-            c.run("cd {0} && ./{1} {2}".format(prj,
-                                               prj_python(prj).relative_to(prj),
-                                               py.relative_to(prj)))
+            print(f"-- Executing {py} --")
+            c.run(f"uv run python {py}")
+    else:
+        print("No *.py in src")
+
+
 
 @task
 def runrs(c):
@@ -224,19 +231,17 @@ def runrs(c):
     Esegue i file src/*.R nella directory radice del progetto e ne salva l'output in
     tmp
     """
-    rs = prj_srcrs(prj)
+    rs = prj_src_dir.glob("*.R")
+    # rs = prj_srcrs(prj)
     if rs:
         for r in rs:
             infile = r
-            # outfile = prj_tmp_dir(prj) / (str(r.stem) + ".txt")
-            outfile = Path("tmp") / (str(r.stem) + ".txt")
-            print("Executing {0} (output in {1})".format(infile, outfile))
-            cmd = "cd {0} && R CMD BATCH --no-save --no-restore {1} {2}".format(
-                prj,
-                infile.relative_to(prj),
-                outfile.relative_to(prj)
-            )
+            outfile = prj_tmp_dir / (str(r.stem) + ".txt")
+            print(f"Executing {infile} (output in {outfile})")
+            cmd = f"R CMD BATCH --no-save --no-restore {infile} {outfile}"
             c.run(cmd)
+    else:
+        print("No *.R in src")
 
 
 
@@ -249,12 +254,9 @@ def report(c):
     ln = "ln -s src/report.tex"
     pdflatex = "pdflatex report"
     pythontex = "uv run pythontex report"
-    
     # pythontex = "pythontex --interpreter python:.venv/bin/python report"
-
     biber = "biber report"
     pdf_view = f"{pdf_viewer} report.pdf"
-    
     c.run(
         "{0} && {1} && {2} && {3} && {4} && {5} && {6} && {7} && {8}".format(
             rmln, ln, pdflatex, biber, pythontex, pdflatex, pdflatex, pdf_view, clean_cmd
