@@ -44,6 +44,16 @@ prj_dataset_link    =  prj / "data" / "dataset.xlsx"
 prj_protocol_link   =  prj / "proj" / "docs" / "protocol.pdf"
 
 
+def get_metadata():
+    """Read/parse the project .ini file containing information inserted during
+    project creation."""
+    metadata = configparser.ConfigParser()
+    metadata.read(prj_ini)
+    return metadata
+
+
+
+
 def import_data():
     """
     Import latest dataset and set up proper symlinks.
@@ -126,13 +136,13 @@ def init(c):
     subprocess.run(["rm", "-rf", "hello.py"])
     subprocess.run(["uv", "add"] + default_prj_requirements)
     # adding the remote for git
-    metadata = configparser.ConfigParser()
-    metadata.read(prj_ini)
+    metadata = get_metadata()
     url = metadata["project"]["url"]
     cmd = f"git init -b master && git remote add origin {url} && git add . && git commit -m 'Directory setup'"
     os.system(cmd)
     # -----------------------------------------------------------
     return None
+
 
 
 @task
@@ -264,80 +274,53 @@ def report(c):
     )
 
 
-   
-@task
-def zip(c):
-    """
-    Zippa il report.pdf e i file in prj/outputs per l'invio.
-    """
-    outputs = list(prj_outputs_dir(prj).iterdir()) + [prj_report(prj)]
-    outpaths = [f.resolve() for f in outputs]
-    zip_fpath = Path("/tmp/{0}.zip".format(prj))
-    if zip_fpath.exists():
-        zip_fpath.unlink()
-    with ZipFile(zip_fpath, "w") as zip:
-        for f in outpaths:
-            arcn = prj / f.name if f.name == 'report.pdf' else prj / "allegati" / f.name
-            zip.write(f, arcname = arcn)
-
-   
 @task
 def tgrep(c):
     """
     Invia il report.pdf via telegram nella chat lavoro.
     """
-    the_report = prj_report(prj).resolve()
-    if not the_report.exists():
-        raise ValueError("Non esiste {}.".format(the_report))
-    c.run("winston_sends {} group::lavoro".format(the_report))
+    if not prj_report.exists():
+        raise ValueError(f"Non esiste {prj_report}.")
+    c.run(f"winston_sends {prj_report} group::lavoro")
 
 
 @task
-def tgout(c):
+def zip(c):
     """
-    Invia gli allegati nella cartella outputs via telegram nella chat lavoro.
+    Zippa il report.pdf e i file in prj/outputs per l'invio.
     """
-    outputs = list(prj_outputs_dir(prj).iterdir())
-    outpaths = [f.resolve() for f in outputs]
-    if outpaths:
-        for f in outpaths:
-            c.run("winston_sends {} group::lavoro &".format(f))
-    else:
-        raise ValueError("Non vi sono file in {}.".format(prj_outputs_dir(prj)))
+    # Anche qui errori strani di invoke
+    # outputs = list(prj_outputs_dir.iterdir()) + [prj_report]
+    # outpaths = [f.resolve() for f in outputs]
+    metadata = get_metadata()
+    acronym = metadata["project"]["acronym"]
+    pi = metadata["pi"]["surname"]
+    zip_fpath = Path(f"/tmp/{pi}_{acronym}.zip")
+    if zip_fpath.exists():
+        zip_fpath.unlink()
+    # with ZipFile(zip_fpath, "w") as zip:
+    #     for f in outpaths:
+    #         arcn = prj / f.name if f.name == 'report.pdf' else prj / "allegati" / f.name
+    #         zip.write(f, arcname = arcn)
+    cmd = f"zip -r {zip_fpath} {prj_report} {prj_outputs_dir}"
+    c.run(cmd)
+
 
 
 @task
-def tgzip(c):
+def mypy(c):
     """
-    Invia il malloppone zippato via telegram nella chat lavoro
+    Esegue mypy nella cartella src del progetto.
     """
-    zip = Path("/tmp/{0}.zip".format(prj))
-    if not zip.exists():
-        raise ValueError("Non esiste {}.".format(zip))
-    c.run(f"winston_sends {zip} group::lavoro")
-
-# @task
-# def lint(c):
-#     """
-#     Esegue il linter (flake8) nella cartella src.
-#     """
-#     c.run("cd {0} && flake8 src".format(prj))
+    c.run("mypy src")
 
 
-# @task
-# def mypy(c):
-#     """
-#     Esegue mypy nella cartella src del progetto.
-#     """
-#     c.run("cd {0} && mypy src".format(prj))
-
-
-# @task
-# def format(c):
-#     """
-#     Esegue il formatter (black) nella cartella src.
-#     """
-#     c.run("cd {0} && black src".format(prj))
+@task
+def ruff(c):
+    """
+    Esegue ruff nella cartella src del progetto.
+    """
+    c.run("ruff check src")
 
 
 @task
