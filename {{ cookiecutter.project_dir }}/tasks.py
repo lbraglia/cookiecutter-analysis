@@ -198,6 +198,14 @@ def edit(c):
 
 
 @task
+def repl(c):
+    """
+    Esegue un interprete python nell'environment considerato
+    """
+    os.system("uv run python")
+
+
+@task
 def runpys(c):
     """
     Esegue i file src/*.py nella directory radice del progetto.
