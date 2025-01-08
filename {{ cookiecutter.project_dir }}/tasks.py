@@ -10,7 +10,10 @@ from zipfile import ZipFile
 from invoke import task
 from tkinter.filedialog import askopenfilename
 
-# ----------------------------------------------- Parameters
+# -----------------------------------------------------------------------------------------------
+# PARAMETERS
+# -----------------------------------------------------------------------------------------------
+
 # external programs
 editor = "emacs --no-splash -r -fh"
 pdf_viewer = "okular --unique"
@@ -19,39 +22,32 @@ clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *
 # libraries needed for any project
 default_prj_requirements = ["pandas", "file:///home/l/.src/pypkg/pylbmisc"]
 
-# Directories/PATHS
-prj = Path(".")
-prj_src_dir         = prj / "src"
-prj_tmp_dir         = prj / "tmp"
-prj_data_dir        = prj / "data"
-prj_outputs_dir     = prj / "outputs"
-prj_proj_dir        = prj / "proj"
-prj_ini             = prj / "proj" / "info.ini"
-prj_docs_dir        = prj / "proj" / "docs"
-prj_biblio_common   = prj / "proj" / "biblio" / "common_biblio.bib"
-prj_biblio_specific = prj / "proj" / "biblio" / "prj_biblio.bib"
+# -----------------------------------------------------------------------------------------------
+# PATHS
+# -----------------------------------------------------------------------------------------------
 
-prj_report          = prj / "report.pdf"
-prj_readme          = prj / "README.md"
+root = Path(".")
+src_dir       = root / "src"
+tmp_dir       = root / "tmp"
+data_dir      = root / "data"
+outputs_dir   = root / "outputs"
+proj_dir      = root / "proj"
+docs_dir      = root / "proj" / "docs"
+common_biblio = root / "proj" / "biblio" / "common_biblio.bib"
+prj_biblio    = root / "proj" / "biblio" / "prj_biblio.bib"
+final_report  = root / "report.pdf"
 
-def prj_dataset(data):
-    return prj / "data" / f"dataset_{data}.xlsx"
-
-def prj_protocol(data):
-    return prj / "proj" / "docs" / f"protocol_{data}.pdf"
-
-prj_dataset_link    =  prj / "data" / "dataset.xlsx"
-prj_protocol_link   =  prj / "proj" / "docs" / "protocol.pdf"
-
+# -----------------------------------------------------------------------------------------------
+# UTILS
+# -----------------------------------------------------------------------------------------------
 
 def get_metadata():
     """Read/parse the project .ini file containing information inserted during
     project creation."""
+    ini_path = proj_dir / "info.ini"
     metadata = configparser.ConfigParser()
-    metadata.read(prj_ini)
+    metadata.read(ini_path)
     return metadata
-
-
 
 
 def import_data():
@@ -62,8 +58,8 @@ def import_data():
         "Insert date of the data extraction (YYYY-MM-DD) or leave blank to skip: "
     ).replace("-", "_")
     if dataset_date != "":
-        outfile = prj_dataset(dataset_date)
-        symlink = prj_dataset_link
+        outfile = data_dir / f"dataset_{dataset_date}.xlsx"
+        symlink = data_dir / "dataset.xlsx"
         title = "Select DATA FILES to be imported and anonymized"
         initialdir = "/tmp"
         filetypes = [("Formati", ".csv .xls .xlsx .zip")]
@@ -87,8 +83,8 @@ def import_protocol():
     msg = "Insert date of the study protocol (YYYY-MM-DD) or leave blank to skip: "
     protocol_date = input(msg).replace("-", "_")
     if protocol_date != "":
-        outfile = prj_protocol(protocol_date)
-        symlink = prj_protocol_link
+        outfile = docs_dir / f"protocol_{protocol_date}.pdf"
+        symlink = docs_dir / "protocol.pdf"
         title = "Select the study protocol file to be imported"
         initialdir = "/tmp"
         filetypes = [("Formati", ".docx .doc .pdf")]
@@ -105,6 +101,9 @@ def import_protocol():
             symlink.unlink()
         symlink.symlink_to(outfile.absolute())
 
+# -----------------------------------------------------------------------------------------------
+# TASKS
+# -----------------------------------------------------------------------------------------------
 
 @task
 def clean(c):
@@ -122,8 +121,8 @@ def init(c):
     # ------------------------------------------------------------
     print("Bibliography setup")
     os.symlink("/home/l/texmf/tex/latex/biblio/biblio.bib",
-               prj_biblio_common.absolute())
-    subprocess.run(["touch", str(prj_biblio_specific)])
+               common_biblio.absolute())
+    subprocess.run(["touch", str(prj_biblio)])
     # -----------------------------------------------------------
     print("Importing protocol")
     import_protocol()
@@ -194,19 +193,19 @@ def edit(c):
     Edita i file rilevanti del progetto con Emacs.
     """
     # non so perché dia error invoke, da debuggare quando si ha piu tempo
-    # prj_src_py  = prj_src_dir.glob("*.py")
-    # prj_src_r   = prj_src_dir.glob("*.R")
-    # prj_src_qmd = prj_src_dir.glob("*.qmd")
-    # prj_src_rnw = prj_src_dir.glob("*.Rnw")
-    # py   = list(prj_src_py)
-    # r    = list(prj_src_r)
-    # qmd  = list(prj_src_qmd)
-    # rnw  = list(prj_src_rnw)
+    # src_py  = src_dir.glob("*.py")
+    # src_r   = src_dir.glob("*.R")
+    # src_qmd = src_dir.glob("*.qmd")
+    # src_rnw = src_dir.glob("*.Rnw")
+    # py   = list(src_py)
+    # r    = list(src_r)
+    # qmd  = list(src_qmd)
+    # rnw  = list(src_rnw)
     # all_files = [str(f) for f in py + r + qmd + rnw]
-    # ignore = [str(prj_src_dir / f) for f in ["src/__init__.py", "src/_region_.tex"]]
+    # ignore = [str(src_dir / f) for f in ["src/__init__.py", "src/_region_.tex"]]
     # edit_files = [f for f in all_files if f not in ignore]
     # paths_str = " ".join(edit_files)
-    paths_str  = str(prj_src_dir / "*")
+    paths_str  = str(src_dir / "*")
     cmd = f"{editor}  {paths_str} & " 
     os.system(cmd)
 
@@ -224,8 +223,8 @@ def runpys(c):
     """
     Esegue i file src/*.py nella directory radice del progetto.
     """
-    # pys = prj_srcpys(prj)
-    pys = prj_src_dir.glob("*.py")
+    # pys = srcpys(prj)
+    pys = src_dir.glob("*.py")
     for py in pys:
         print(f"-- Executing {py} --")
         c.run(f"uv run python {py}")
@@ -237,10 +236,10 @@ def runrs(c):
     Esegue i file src/*.R nella directory radice del progetto e ne salva l'output in
     tmp
     """
-    rs = prj_src_dir.glob("*.R")
+    rs = src_dir.glob("*.R")
     for r in rs:
         infile = r
-        outfile = prj_tmp_dir / (str(r.stem) + ".txt")
+        outfile = tmp_dir / (str(r.stem) + ".txt")
         print(f"Executing {infile} (output in {outfile})")
         cmd = f"R CMD BATCH --no-save --no-restore {infile} {outfile}"
         c.run(cmd)
@@ -271,9 +270,9 @@ def tgrep(c):
     """
     Invia il report.pdf via telegram nella chat lavoro.
     """
-    if not prj_report.exists():
-        raise ValueError(f"Non esiste {prj_report}.")
-    c.run(f"winston_sends {prj_report} group::lavoro")
+    if not final_report.exists():
+        raise ValueError(f"Non esiste {final_report}.")
+    c.run(f"winston_sends {final_report} group::lavoro")
 
 
 @task
@@ -292,9 +291,9 @@ def zip(c):
 
     with ZipFile(zip_fpath, "w") as zip:
         # report
-        zip.write(prj_report, f"{paste}/report.pdf")
+        zip.write(final_report, f"{paste}/report.pdf")
         # allegati
-        for a in prj_outputs_dir.iterdir():
+        for a in outputs_dir.iterdir():
             if not a.name.startswith("."):
                 zip.write(a, f"{paste}/allegati/{a.name}")
 
