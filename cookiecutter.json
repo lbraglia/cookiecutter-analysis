@@ -4,7 +4,7 @@
     "pi_uo": "CTC",
     "project_description": "A brief description/hint/lore of the project",
     "project_acronym": "test",
-    "project_title" : "Formal project title.",
+    "project_title" : "Formal project title",
     "project_dir": "{{cookiecutter.pi_surname.lower().replace(' ', '_')}}_{{cookiecutter.project_acronym.lower().replace(' ', '_')}}",
     "project_repo": "prj{% now 'utc', '%y' %}_{{cookiecutter.project_dir}}",
     "project_created": "{% now 'utc', '%Y-%m-%d' %}",
