@@ -1,8 +1,12 @@
 {
-    "customer_surname": "braglia",
+    "pi_surname": "braglia",
+    "pi_name": "luca",
+    "pi_uo": "CTC",
+    "project_description": "Description of the project",
     "project_acronym": "test",
     "project_title" : "Project title.",
-    "project_slug": "{{cookiecutter.customer_surname.lower().replace(' ', '_')}}_{{cookiecutter.project_acronym.lower().replace(' ', '_')}}",
+    "project_dir": "{{cookiecutter.pi_surname.lower().replace(' ', '_')}}_{{cookiecutter.project_acronym.lower().replace(' ', '_')}}",
+    "project_repo": "prj{% now 'utc', '%y' %}_{{cookiecutter.project_dir}}",
     "project_created": "{% now 'utc', '%Y-%m-%d' %}",
-    "project_repo": "prj{% now 'utc', '%y' %}_{{cookiecutter.project_slug}}"
+    "project_contatto": "{{cookiecutter.pi_surname}}"
 }

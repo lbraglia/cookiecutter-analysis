@@ -18,103 +18,35 @@ editor = "emacs --no-splash -r -fh"
 pdf_viewer = "okular --unique"
 clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *.bcf *.blg *.run.xml *.out *.Rnw"
 
+# libraries needed for any project
+default_prj_requirements = ["pandas", "file:///home/l/.src/pypkg/pylbmisc"]
 
-def prj_report(prj):
-    return prj / "report.pdf"
+# Directories/PATHS
+prj = Path(".")
+prj_src_dir         = prj / "src"
+prj_tmp_dir         = prj / "tmp"
+prj_data_dir        = prj / "data"
+prj_outputs_dir     = prj / "outputs"
+prj_proj_dir        = prj / "proj"
+prj_ini             = prj / "proj" / "info.ini"
+prj_docs_dir        = prj / "proj" / "docs"
+prj_biblio_common   = prj / "proj" / "biblio" / "common_biblio.bib"
+prj_biblio_specific = prj / "proj" / "biblio" / "prj_biblio.bib"
 
+prj_report          = prj / "report.pdf"
+prj_readme          = prj / "README.md"
 
-def prj_tmp_dir(prj):
-    return prj / "tmp"
+def prj_dataset(data):
+    return prj / "data" / f"dataset_{data}.xlsx"
 
-def prj_data_dir(prj):
-    return prj / "data"
+def prj_protocol(data):
+    return prj / "proj" / "docs" / f"protocol_{data}.pdf"
 
-
-def prj_dataset(prj, dataset_date):
-    return prj / "data" / "dataset_{0}.xlsx".format(dataset_date)
-
-
-def prj_dataset_link(prj):
-    return prj / "data" / "dataset.xlsx"
-
-
-def prj_outputs_dir(prj):
-    return prj / "outputs"
-
-
-def prj_proj_dir(prj):
-    return prj / "proj"
-
-
-def prj_metadata(prj):
-    return prj / "proj" / "metadata.ini"
+prj_dataset_link    =  prj / "data" / "dataset.xlsx"
+prj_protocol_link   =  prj / "proj" / "docs" / "protocol.pdf"
 
 
-def prj_requirements(prj):
-    return prj / "proj" / "requirements.txt"
-
-
-def prj_biblio_dir(prj):
-    return prj / "proj" / "biblio"
-
-
-def prj_biblio_common(prj):
-    return prj / "proj" / "biblio" / "common_biblio.bib"
-
-
-def prj_biblio_specific(prj):
-    return prj / "proj" / "biblio" / "prj_biblio.bib"
-
-
-def prj_docs_dir(prj):
-    return prj / "proj" / "docs"
-
-
-def prj_protocol(prj, protocol_date):
-    return prj / "proj" / "docs" / "protocol_{0}.pdf".format(protocol_date)
-
-
-def prj_protocol_link(prj):
-    return prj / "proj" / "docs" / "protocol.pdf"
-
-
-# def prj_src_dir(prj):
-#     return prj / "src"
-
-
-
-
-def prj_srcpys(prj):
-    return prj_src_dir(prj).glob("*.py")
-
-
-def prj_srcrs(prj):
-    return prj_src_dir(prj).glob("*.R")
-
-
-def prj_readme(prj):
-    return prj / "README.md"
-
-
-def prj_venv(prj):
-    # virtual environment ~/.venv/prj
-    return prj / ".venv"
-
-
-def prj_python(prj):
-    return prj_venv(prj) / "bin" / "python"
-
-
-
-def freeze_venv(prj):
-    """
-    Fai il freeze del virtual environments e salvalo in requirements.txt
-    """
-    cmd = "{0} -m pip freeze > {1}".format(prj_python(prj), prj_requirements(prj))
-    os.system(cmd)
-
-
-def import_data(prj):
+def import_data():
     """
     import dataset as a and set up useful symlinks
     """
@@ -122,8 +54,8 @@ def import_data(prj):
         "Insert date of the data extraction (YYYY-MM-DD) or leave blank to skip: "
     ).replace("-", "_")
     if dataset_date != "":
-        outfile = prj_dataset(prj, dataset_date)
-        symlink = prj_dataset_link(prj)
+        outfile = prj_dataset(dataset_date)
+        symlink = prj_dataset_link
         title = "Select DATA FILES to be imported and anonymized"
         initialdir = "/tmp"
         filetypes = [("Formati", ".csv .xls .xlsx .zip")]
@@ -140,15 +72,15 @@ def import_data(prj):
         symlink.symlink_to(outfile.absolute())
 
 
-def import_protocol(prj):
+def import_protocol():
     """
     import protocol with date and set up useful symlinks
     """
     msg = "Insert date of the study protocol (YYYY-MM-DD) or leave blank to skip: "
     protocol_date = input(msg).replace("-", "_")
     if protocol_date != "":
-        outfile = prj_protocol(prj, protocol_date)
-        symlink = prj_protocol_link(prj)
+        outfile = prj_protocol(protocol_date)
+        symlink = prj_protocol_link
         title = "Select the study protocol file to be imported"
         initialdir = "/tmp"
         filetypes = [("Formati", ".docx .doc .pdf")]
@@ -166,19 +98,13 @@ def import_protocol(prj):
         symlink.symlink_to(outfile.absolute())
 
 
-# --------------------------------------------------------------------------------
-# Project tasks
-# --------------------------------------------------------------------------------
-help_prj = "Directory da utilizzare per il task."
-help_repo = "Repository bitbucket da clonare."
 
-
-@task(help={"prj": help_prj})
-def clean(c, prj="."):
+@task
+def clean(c):
     """
     Pulisce la directory del progetto.
     """
-    c.run(f"{clean_cmd}")
+    c.run(clean_cmd)
 
 
 @task
@@ -189,103 +115,90 @@ def init(c):
     # ------------------------------------------------------------
     print("Bibliography setup")
     os.symlink("/home/l/texmf/tex/latex/biblio/biblio.bib",
-               os.path.abspath("proj/biblio/common_biblio.bib"))
-    subprocess.run(["touch", "proj/biblio/prj_biblio.bib"])
+               prj_biblio_common.absolute())
+    subprocess.run(["touch", str(prj_biblio_specific)])
     # -----------------------------------------------------------
     print("Importing protocol")
-    import_protocol(".")
+    import_protocol()
     # -----------------------------------------------------------
     print("Importing dataset")
-    import_data(".")
+    import_data()
     # -----------------------------------------------------------
     print("UV init")
     subprocess.run(["uv", "init", "."])
     subprocess.run(["rm", "-rf", "hello.py"])
-    default_requirements = [
-        "pandas",
-        "file:///home/l/.src/pypkg/pylbmisc"
-    ]
-    subprocess.run(["uv", "add"] + default_requirements)
+    subprocess.run(["uv", "add"] + default_prj_requirements)
     # adding the remote for git
-    proj_info = configparser.ConfigParser()
-    proj_info.read("proj/info.ini")
-    proj_url = proj_info["project"]["url"]
-    cmd = f"git init -b master && git remote add origin {proj_url} && git add . && git commit -m 'Directory setup'"
+    metadata = configparser.ConfigParser()
+    metadata.read(prj_ini)
+    url = metadata["project"]["url"]
+    cmd = f"git init -b master && git remote add origin {url} && git add . && git commit -m 'Directory setup'"
     os.system(cmd)
     # -----------------------------------------------------------
     return None
 
 
-@task(help={"prj": help_prj})
-def dataimp(c, prj="."):
+@task
+def dataimp(c):
     """
     Importa il dataset nella directory del progetto.
     """
-    import_data(prj)
+    import_data()
 
 
-@task(help={"prj": help_prj})
-def protimp(c, prj="."):
+@task
+def protimp(c):
     """
     Importa il protocollo nella directory del progetto.
     """
-    import_protocol(prj)
-
-
-@task(help={"prj": help_prj})
-def venvrepl(c, prj="."):
-    """
-    Usa l'environment del progetto in maniera interattiva.
-    """
-    os.system("uv run python -i")
+    import_protocol()
 
 
 
-# @task(help={"prj": help_prj})
-# def venvfreeze(c, prj="."):
-#     """
-#     A fine progetto fai il freeze dei requirements per riproducibilità.
-#     """
-#     freeze_venv(prj)
 
 
-@task(help={"prj": help_prj})
-def viewdoc(c, prj="."):
+@task
+def viewdoc(c):
     """
     Mostra la documentazione del progetto (file proj/docs/*.pdf).
     """
-    cmd = f"{pdf_viewer} proj/docs/*/*.pdf"
-    c.run(cmd)
+    cmd = f"{pdf_viewer} proj/docs/*/*.pdf &"
+    os.system(cmd)
 
 
-@task(default=True, help={"prj": help_prj})
-def edit(c, prj="."):
+@task
+def edit(c):
     """
     Edita i file rilevanti del progetto con Emacs.
     """
-    src_dir = Path("src")
-    py = list(src_dir.glob("*.py"))
-    tex = list(src_dir.glob("*.tex"))
-    r = list(src_dir.glob("*.R"))
-    rnw = list(src_dir.glob("*.Rnw"))
-    edit_files =  py + tex + r + rnw
-    ignore = [src_dir / "src/__init__.py", src_dir / "src/_region_.tex"] 
-    all_files = [f for f in edit_files if f not in ignore]
-    relative_paths = " ".join([str(f.relative_to(".")) for f in all_files])
-    cmd = f"{editor} {relative_paths} &"
-    c.run(cmd)
+    # non so perché dia error invoke, da debuggare quando si ha piu tempo
+    # prj_src_py  = prj_src_dir.glob("*.py")
+    # prj_src_r   = prj_src_dir.glob("*.R")
+    # prj_src_qmd = prj_src_dir.glob("*.qmd")
+    # prj_src_rnw = prj_src_dir.glob("*.Rnw")
+    # py   = list(prj_src_py)
+    # r    = list(prj_src_r)
+    # qmd  = list(prj_src_qmd)
+    # rnw  = list(prj_src_rnw)
+    # all_files = [str(f) for f in py + r + qmd + rnw]
+    # ignore = [str(prj_src_dir / f) for f in ["src/__init__.py", "src/_region_.tex"]]
+    # edit_files = [f for f in all_files if f not in ignore]
+    # paths_str = " ".join(edit_files)
+    paths_str  = str(prj_src_dir / "*")
+    cmd = f"{editor}  {paths_str} & " 
+    os.system(cmd)
 
 
-# @task(help={"prj": help_prj})
-# def vscode(c, prj="."):
+# @task
+# def vscode(c):
 #     """
 #     Edita la cartella con Codium (vscode).
 #     """
 #     c.run("codium {0}".format(prj))
 
 
-@task(help={"prj": help_prj})
-def runpys(c, prj="."):
+@task
+def runpys(c):
     """
     Esegue i file src/*.py nella directory radice del progetto.
     """
@@ -297,8 +210,8 @@ def runpys(c, prj="."):
                                                prj_python(prj).relative_to(prj),
                                                py.relative_to(prj)))
 
-@task(help={"prj": help_prj})
-def runrs(c, prj="."):
+@task
+def runrs(c):
     """
     Esegue i file src/*.R nella directory radice del progetto e ne salva l'output in
     tmp
@@ -318,28 +231,32 @@ def runrs(c, prj="."):
             c.run(cmd)
 
 
-@task(help={"prj": help_prj})
-def report(c, prj="."):
+
+@task
+def report(c):
     """
     Esegue pdflatex/pythontex su src/report.tex nella directory radice del progetto e visualizza il pdf.
     """
+    rmln = "rm -rf report.tex"
     ln = "ln -s src/report.tex"
     pdflatex = "pdflatex report"
-    pythontex = "pythontex --interpreter python:{0} report".format(
-        prj_python(prj).expanduser().relative_to(prj)
-    )
+    pythontex = "uv run pythontex report"
+    
+    # pythontex = "pythontex --interpreter python:.venv/bin/python report"
+
     biber = "biber report"
-    pdf_view = "{0} report.pdf".format(pdf_viewer)
+    pdf_view = f"{pdf_viewer} report.pdf"
+    
     c.run(
-        "cd {0} && {1} && {2} && {3} && {4} && {5} && {6} && {7} && {8}".format(
-            prj, ln, pdflatex, biber, pythontex, pdflatex, pdflatex, pdf_view, clean_cmd
+        "{0} && {1} && {2} && {3} && {4} && {5} && {6} && {7} && {8}".format(
+            rmln, ln, pdflatex, biber, pythontex, pdflatex, pdflatex, pdf_view, clean_cmd
         )
     )
 
 
    
-@task(help={"prj": help_prj})
-def zip(c, prj="."):
+@task
+def zip(c):
     """
     Zippa il report.pdf e i file in prj/outputs per l'invio.
     """
@@ -354,8 +271,8 @@ def zip(c, prj="."):
             zip.write(f, arcname = arcn)
 
    
-@task(help={"prj": help_prj})
-def tgrep(c, prj="."):
+@task
+def tgrep(c):
     """
     Invia il report.pdf via telegram nella chat lavoro.
     """
@@ -365,8 +282,8 @@ def tgrep(c, prj="."):
     c.run("winston_sends {} group::lavoro".format(the_report))
 
 
-@task(help={"prj": help_prj})
-def tgout(c, prj="."):
+@task
+def tgout(c):
     """
     Invia gli allegati nella cartella outputs via telegram nella chat lavoro.
     """
@@ -379,8 +296,8 @@ def tgout(c, prj="."):
         raise ValueError("Non vi sono file in {}.".format(prj_outputs_dir(prj)))
 
 
-@task(help={"prj": help_prj})
-def tgzip(c, prj="."):
+@task
+def tgzip(c):
     """
     Invia il malloppone zippato via telegram nella chat lavoro
     """
@@ -389,24 +306,24 @@ def tgzip(c, prj="."):
         raise ValueError("Non esiste {}.".format(zip))
     c.run(f"winston_sends {zip} group::lavoro")
 
-# @task(help={"prj": help_prj})
-# def lint(c, prj="."):
+# @task
+# def lint(c):
 #     """
 #     Esegue il linter (flake8) nella cartella src.
 #     """
 #     c.run("cd {0} && flake8 src".format(prj))
 
 
-# @task(help={"prj": help_prj})
-# def mypy(c, prj="."):
+# @task
+# def mypy(c):
 #     """
 #     Esegue mypy nella cartella src del progetto.
 #     """
 #     c.run("cd {0} && mypy src".format(prj))
 
 
-# @task(help={"prj": help_prj})
-# def format(c, prj="."):
+# @task
+# def format(c):
 #     """
 #     Esegue il formatter (black) nella cartella src.
 #     """
