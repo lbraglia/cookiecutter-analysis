@@ -226,13 +226,9 @@ def runpys(c):
     """
     # pys = prj_srcpys(prj)
     pys = prj_src_dir.glob("*.py")
-    if pys:
-        for py in pys:
-            print(f"-- Executing {py} --")
-            c.run(f"uv run python {py}")
-    else:
-        print("No *.py in src")
-
+    for py in pys:
+        print(f"-- Executing {py} --")
+        c.run(f"uv run python {py}")
 
 
 @task
@@ -242,16 +238,12 @@ def runrs(c):
     tmp
     """
     rs = prj_src_dir.glob("*.R")
-    # rs = prj_srcrs(prj)
-    if rs:
-        for r in rs:
-            infile = r
-            outfile = prj_tmp_dir / (str(r.stem) + ".txt")
-            print(f"Executing {infile} (output in {outfile})")
-            cmd = f"R CMD BATCH --no-save --no-restore {infile} {outfile}"
-            c.run(cmd)
-    else:
-        print("No *.R in src")
+    for r in rs:
+        infile = r
+        outfile = prj_tmp_dir / (str(r.stem) + ".txt")
+        print(f"Executing {infile} (output in {outfile})")
+        cmd = f"R CMD BATCH --no-save --no-restore {infile} {outfile}"
+        c.run(cmd)
 
 
 
@@ -289,21 +281,22 @@ def zip(c):
     """
     Zippa il report.pdf e i file in prj/outputs per l'invio.
     """
-    # Anche qui errori strani di invoke
-    # outputs = list(prj_outputs_dir.iterdir()) + [prj_report]
-    # outpaths = [f.resolve() for f in outputs]
     metadata = get_metadata()
     acronym = metadata["project"]["acronym"]
     pi = metadata["pi"]["surname"]
-    zip_fpath = Path(f"/tmp/{pi}_{acronym}.zip")
+    paste = f"{pi}_{acronym}"
+
+    zip_fpath = Path(f"/tmp/{paste}.zip")
     if zip_fpath.exists():
         zip_fpath.unlink()
-    # with ZipFile(zip_fpath, "w") as zip:
-    #     for f in outpaths:
-    #         arcn = prj / f.name if f.name == 'report.pdf' else prj / "allegati" / f.name
-    #         zip.write(f, arcname = arcn)
-    cmd = f"zip -r {zip_fpath} {prj_report} {prj_outputs_dir}"
-    c.run(cmd)
+
+    with ZipFile(zip_fpath, "w") as zip:
+        # report
+        zip.write(prj_report, f"{paste}/report.pdf")
+        # allegati
+        for a in prj_outputs_dir.iterdir():
+            if not a.name.startswith("."):
+                zip.write(a, f"{paste}/allegati/{a.name}")
 
 
 
