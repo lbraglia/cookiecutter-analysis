@@ -58,8 +58,8 @@ def import_data():
         "Insert date of the data extraction (YYYY-MM-DD) or leave blank to skip: "
     ).replace("-", "_")
     if dataset_date != "":
-        outfile = data_dir / f"dataset_{dataset_date}.xlsx"
-        symlink = data_dir / "dataset.xlsx"
+        outfile = data_dir / f"raw_dataset_{dataset_date}.xlsx"
+        symlink = data_dir / "raw_dataset.xlsx"
         title = "Select DATA FILES to be imported and anonymized"
         initialdir = "/tmp"
         filetypes = [("Formati", ".csv .xls .xlsx .zip")]
@@ -73,7 +73,7 @@ def import_data():
         # add symlink
         if symlink.exists():
             symlink.unlink()
-        symlink.symlink_to(outfile.absolute())
+        symlink.symlink_to(outfile.relative_to(data_dir))
 
 
 def import_protocol():
