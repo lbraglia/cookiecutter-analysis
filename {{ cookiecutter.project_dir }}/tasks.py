@@ -72,7 +72,7 @@ def import_data():
         lb.io.data_export(x=dfs, path=outfile.absolute(), index=False)
         # add symlink
         if symlink.exists():
-            symlink.unlink()
+            symlink.rename(data_dir / "old_raw_dataset.xlsx")
         symlink.symlink_to(outfile.relative_to(data_dir))
 
 
