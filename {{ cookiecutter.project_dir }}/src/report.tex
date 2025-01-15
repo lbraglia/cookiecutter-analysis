@@ -28,6 +28,8 @@
 # import matplotlib.pyplot as plt
 # import pylbmisc as lb
 # from src.include import fun
+# df = pd.read_pickle("tmp/clean_df.pkl")
+
 \end{pycode}
 
 
@@ -46,3 +48,60 @@ Statistical analysis was conducted using Python \cite{python}.
 % ================================================================================ %
 \printbibliography 
 \end{document}
+
+% 1) TABELLE: per una tabella rapida la funzione lb.io.latex_table che stampa una
+% tabella (un pd.DataFrame o un oggetto inheritante avente il metodo
+% to_latex). Per esportare più complessivamente (latex ed excel) usare qualcosa
+% del genere
+% exported = {
+%     "Descrittive": desc_df,
+%     "Analisi 1"  : analysis1_df,
+%     "Analisi 2"  : analysis2_df
+% }
+% latex_refs = lb.io.export_tables(exported)
+
+% 2) IMMAGINI: salvare l'immagine in un pycode (non visualizzato) e poi
+% inserirla in latex normalmente mediante \includegraphics che potrà essere
+% stampato con print (oppure incluso a mano sotto al codice python, in quello
+% latex).
+% lb.io.fig_dump velocizza: in un environment di pycode (codice non stampato,
+% per report) basta questo che salva la figura e stampa il codice latex per
+% includerla
+%
+% fig, ax = plt.subplots()
+% x = np.linspace(0, 10, 100)
+% ax.plot(x, np.sin(x), label = 'sin(x)')
+% ax.plot(x, np.cos(x), label = 'cos(x)')
+% ax.legend()
+%
+% lb.io.fig_dump(fig, label = 'first_plot')
+
+% 3) FUNZIONI PYTHON IN LATEX:
+% - per funzione che stampa del TeX, la definiamo in un pycode e la usiamo in pyc
+%   def whatever(x):
+%      ...
+%   In latex \pyc{whatever(y)}
+% - se in pycode definiamo una funzione whatever e in seguito in latex definiamo
+%   il suo utilizzo entro py, es
+%   \newcommand{\pyfunction}[2]{\py{whatever(#1, #2)}},
+%   poi sempre in latex si potrà usare \pow{2}{3}
+
+
+% 4) UTILIZZARE R (vedere beltrami_cogitab per qualcosa in piu)
+%
+% \begin{Rcode}
+% source("tmp/clean_df.R")
+% library(lbmisc)
+% # esempio di grafici
+% outfile <- "outputs/cogitab_score"
+% code <- "
+%     boxplot(df$score ~ df$sani_ds_mci,
+%             xlab = 'Group', ylab = 'Cogitab score')
+% "
+% lbmisc::fig_dump(code, outfile = outfile)
+% lbmisc::include_figure(outfile,
+%                label = "cogitab_score",
+%                caption = "Boxplot cogitab (tutti i gruppi)",
+%                scale = 0.5)
+
+% \end{Rcode}
