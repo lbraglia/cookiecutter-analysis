@@ -91,15 +91,20 @@ def import_protocol():
         fpath = Path(
             askopenfilename(title=title, initialdir=initialdir, filetypes=filetypes)
         )
-        # pdf: copy, other convert it with pandoc
         if fpath.suffix == ".pdf":
+            # just copy the .pdf file
             shutil.copy(fpath, outfile.absolute())
         else:
-            subprocess.run(["pandoc", "-o", outfile.absolute(), fpath])
+            # convert with libreoffice
+            libreoffice_export = Path("/tmp") / (fpath.stem + '.pdf')
+            if libreoffice_export.exists():
+                libreoffice_export.unlink()
+            os.system(f"libreoffice --headless --convert-to pdf {fpath} --outdir /tmp")
+            shutil.copy(libreoffice_export, outfile.absolute())
         # smart symlinks
         if symlink.exists():
             symlink.unlink()
-        symlink.symlink_to(outfile.absolute())
+        symlink.symlink_to(outfile.relative_to(docs_dir))
 
 # -----------------------------------------------------------------------------------------------
 # TASKS
@@ -120,8 +125,9 @@ def init(c):
     """
     # ------------------------------------------------------------
     print("Bibliography setup")
-    os.symlink("/home/l/texmf/tex/latex/biblio/biblio.bib",
-               common_biblio.absolute())
+    if not common_biblio.exists():
+        os.symlink("/home/l/texmf/tex/latex/biblio/biblio.bib",
+                   common_biblio.absolute())
     subprocess.run(["touch", str(prj_biblio)])
     # -----------------------------------------------------------
     print("Importing protocol")
