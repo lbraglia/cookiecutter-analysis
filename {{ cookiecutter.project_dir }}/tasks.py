@@ -151,7 +151,7 @@ def init(c):
 
 
 @task
-def dataimp(c):
+def impdata(c):
     """
     Importa il dataset nella directory del progetto.
     """
@@ -159,7 +159,7 @@ def dataimp(c):
 
 
 @task
-def protimp(c):
+def impprot(c):
     """
     Importa il protocollo nella directory del progetto.
     """
@@ -333,13 +333,13 @@ def ruff(c):
 @task
 def list(c):
     """
-    List invoke tasks.
+    Lista i task di Invoke.
     """
     c.run("invoke -l")
 
 @task
 def help(c):
     """
-    Invoke's help.
+    Help di Invoke.
     """
     c.run("invoke -h") 
