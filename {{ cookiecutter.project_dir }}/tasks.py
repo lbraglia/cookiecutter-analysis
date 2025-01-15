@@ -20,7 +20,7 @@ pdf_viewer = "okular --unique"
 clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *.bcf *.blg *.run.xml *.out *.Rnw"
 
 # libraries needed for any project
-default_prj_requirements = ["pandas", "file:///home/l/.src/pypkg/pylbmisc"]
+default_prj_requirements = ["pandas", "openpyxl", "file:///home/l/.src/pypkg/pylbmisc"]
 
 # -----------------------------------------------------------------------------------------------
 # PATHS
@@ -164,6 +164,15 @@ def protimp(c):
     Importa il protocollo nella directory del progetto.
     """
     import_protocol()
+
+
+@task
+def viewdata(c):
+    """
+    Mostra il dataset ultima versione.
+    """
+    cmd = f"libreoffice --calc --view data/raw_dataset.xlsx &"
+    os.system(cmd)
 
 
 @task
