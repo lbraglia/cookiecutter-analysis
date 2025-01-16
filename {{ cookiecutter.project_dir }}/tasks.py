@@ -203,6 +203,7 @@ def init(c):
     subprocess.run(["rm", "-rf", "hello.py"])
     subprocess.run(["uv", "add"] + default_prj_requirements)
     # adding the remote for git
+    print("Git init")
     url = metadata["project"]["url"]
     cmd = f"git init -b master && git remote add origin {url} && git add . && git commit -m 'Directory setup'"
     os.system(cmd)
@@ -294,11 +295,18 @@ def edit(c):
 
 
 @task
-def repl(c):
+def venvrepl(c):
     """
     Esegue un interprete python nell'environment considerato
     """
     os.system("uv run python")
+
+@task
+def venvrefresh(c):
+    """
+    Sincronizza uv per far si che tutte le dipendenze siano soddisfatte
+    """
+    os.system("uv sync")
 
 
 @task
