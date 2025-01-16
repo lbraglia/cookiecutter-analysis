@@ -22,7 +22,7 @@ pdf_viewer = "okular --unique"
 clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *.bcf *.blg *.run.xml *.out *.Rnw"
 
 # libraries needed for any project
-default_prj_requirements = ["pandas", "openpyxl", "file:///home/l/.src/pypkg/pylbmisc"]
+default_prj_requirements = ["pandas", "openpyxl", "--editable", "file:///home/l/.src/pypkg/pylbmisc"]
 
 # -----------------------------------------------------------------------------------------------
 # PATHS
@@ -165,7 +165,11 @@ project-ndatasets:: 1
         print(logseq_template, file = f)
 
 
-
+def uv_init():
+    os.system("rm -rf .venv uv.lock pyproject.toml")
+    subprocess.run(["uv", "init", "."])
+    subprocess.run(["rm", "-rf", "hello.py"])
+    subprocess.run(["uv", "add"] + default_prj_requirements)
 
 # -----------------------------------------------------------------------------------------------
 # TASKS
@@ -199,10 +203,8 @@ def init(c):
     import_data()
     # -----------------------------------------------------------
     print("UV init")
-    subprocess.run(["uv", "init", "."])
-    subprocess.run(["rm", "-rf", "hello.py"])
-    subprocess.run(["uv", "add"] + default_prj_requirements)
-    # adding the remote for git
+    uv_init()
+    # -----------------------------------------------------------
     print("Git init")
     url = metadata["project"]["url"]
     cmd = f"git init -b master && git remote add origin {url} && git add . && git commit -m 'Directory setup'"
@@ -293,6 +295,12 @@ def edit(c):
     cmd = f"{editor}  {paths_str} & " 
     os.system(cmd)
 
+@task
+def venvinit(c):
+    """
+    Inizializza uv
+    """
+    uv_init()
 
 @task
 def venvrepl(c):
