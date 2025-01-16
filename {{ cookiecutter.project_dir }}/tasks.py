@@ -2,6 +2,8 @@ import configparser
 import os
 import shutil
 import subprocess
+import datetime as dt
+import calendar
 
 import pylbmisc as lb
 
@@ -26,6 +28,7 @@ default_prj_requirements = ["pandas", "openpyxl", "file:///home/l/.src/pypkg/pyl
 # PATHS
 # -----------------------------------------------------------------------------------------------
 
+# project
 root = Path(".")
 src_dir       = root / "src"
 tmp_dir       = root / "tmp"
@@ -36,6 +39,9 @@ docs_dir      = root / "proj" / "docs"
 common_biblio = root / "proj" / "biblio" / "common_biblio.bib"
 prj_biblio    = root / "proj" / "biblio" / "prj_biblio.bib"
 final_report  = root / "report.pdf"
+
+# outside project
+brain = Path("~/.brain/pages").expanduser()
 
 # -----------------------------------------------------------------------------------------------
 # UTILS
@@ -106,6 +112,61 @@ def import_protocol():
             symlink.unlink()
         symlink.symlink_to(outfile.relative_to(docs_dir))
 
+
+
+def create_logseq_page(fpath, metadata):
+    pi_surname = metadata["pi"]["surname"]
+    pi_name = metadata["pi"]["name"]
+    pi_uo = metadata["pi"]["uo"]
+
+    prj_description = metadata["project"]["description"]
+    prj_acronym = metadata["project"]["acronym"]
+    prj_title = metadata["project"]["title"]
+    prj_dir = metadata["project"]["dir"]
+    prj_url = metadata["project"]["url"]
+    prj_created = metadata["project"]["created"]
+    prj_contatto = metadata["project"]["contatto"]
+
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    dow = days[dt.date.fromisoformat(prj_created).weekday()]
+    created = f"{prj_created} {dow}"
+
+    logseq_template = f"""type:: [[project]]
+area:: [[lavoro]]
+priority:: A
+description:: {prj_description}
+tags:: fase1 | fase2 | fase3 | fase4, 1braccio | 2bracci | +2bracci, superiorità | non-inferiorità | equivalenza, coorte | caso-controllo | cross-sectional, eziologico | diagnostico | trattamento | prognostico, prospettico | retrospettivo
+created:: [[{created}]]
+project-title:: {prj_title}
+project-acronym:: {prj_acronym}
+project-PI:: {pi_surname} {pi_name}
+project-contatto:: {prj_contatto}
+pi-struttura:: {pi_uo}
+project-directory:: [here](file:///home/l/projects/{prj_dir})
+project-repo:: [here]({prj_url})
+project-ndatasets:: 1
+-
+- ## Lore
+	-
+-
+- ## Log
+	-
+-
+- ## Appunti
+	-
+-
+- ## Meetings
+	-
+-
+- ## Mail
+	-
+"""
+    with open(fpath, "w") as f:
+        print(logseq_template, file = f)
+
+
+
+
 # -----------------------------------------------------------------------------------------------
 # TASKS
 # -----------------------------------------------------------------------------------------------
@@ -123,6 +184,7 @@ def init(c):
     """
     Inizializza un nuovo progetto parzialmente creato da cookiecutter
     """
+    metadata = get_metadata()
     # ------------------------------------------------------------
     print("Bibliography setup")
     if not common_biblio.exists():
@@ -141,11 +203,17 @@ def init(c):
     subprocess.run(["rm", "-rf", "hello.py"])
     subprocess.run(["uv", "add"] + default_prj_requirements)
     # adding the remote for git
-    metadata = get_metadata()
     url = metadata["project"]["url"]
     cmd = f"git init -b master && git remote add origin {url} && git add . && git commit -m 'Directory setup'"
     os.system(cmd)
     # -----------------------------------------------------------
+    print("Logseq page")
+    # -----------------------------------------------------------
+    logseq_page = brain / (metadata["project"]["dir"] + ".md")
+    if logseq_page.exists():
+        print("logseq page already available, skipping.")
+    else:
+        create_logseq_page(fpath = logseq_page, metadata = metadata)
     return None
 
 
