@@ -67,9 +67,9 @@ def import_data():
             title=title, initialdir=initialdir, filetypes=filetypes, multiple=True
         )
         # import data
-        dfs = lb.io.data_import(fpaths)
+        dfs = lb.io.import_data(fpaths)
         # save as a single excel file
-        lb.io.data_export(x=dfs, path=outfile.absolute(), index=False)
+        lb.io.export_data(x=dfs, path=outfile.absolute(), index=False)
         # add symlink
         if symlink.exists():
             symlink.rename(data_dir / "old_raw_dataset.xlsx")
