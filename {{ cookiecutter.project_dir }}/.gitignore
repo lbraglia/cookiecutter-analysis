@@ -15,3 +15,5 @@ pythontex-files-*
 tmp
 __pycache__
 _codebraid
+/*.docx
+/*.tex
