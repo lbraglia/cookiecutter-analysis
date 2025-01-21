@@ -1,0 +1,67 @@
+\documentclass{article}
+\usepackage{cmbright}
+%% \usepackage[a4paper, top=2cm, bottom=2cm, left=1cm, right=1cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}              %% inglese, progetti internazionali
+%% \usepackage[english, italian]{babel}  %% roba in italiano
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{mypkg}
+\usepackage{hyperref}
+%% \extrafloats{500} % decommentare se ci sono tante tabelle
+\usepackage{biblatex}
+\addbibresource{proj/biblio/common_biblio.bib}
+\addbibresource{proj/biblio/prj_biblio.bib}
+\usepackage{pdflscape}     % per \begin{landscape} \end{landscape}
+\begin{document}
+\title{ {{cookiecutter.pi_surname}} - {{cookiecutter.project_acronym}} }
+% \date{}
+% \maxdeadcycles=1000       % decommentare se ci sono tante tabelle
+\maketitle
+\tableofcontents
+<<setup, include = FALSE>>=
+
+library(knitr)   # necessario per setup knitr
+library(lbmisc)  # necessario per lbmisc::knitr_inline
+
+## setup knitr
+opts_chunk$set(fig.path    = 'outputs/',
+               fig.align   = 'center',
+               size        = 'small',
+               strip.white = TRUE,
+               tidy        = FALSE,
+               echo        = FALSE,
+               error       = TRUE,
+               warning     = TRUE,
+               message     = TRUE,
+               dpi         = 600,
+               dev         = c('png', 'tiff', 'cairo_ps', 'pdf')[c(1, 3, 4)],
+               fig.width   = inches(cm = 8.5),  # dimensioni default journal
+               fig.height  = inches(cm = 8.5),  # dimensioni default journal
+               # compressione lossless dei tiff
+               dev.args    = list(tiff = list(compression = 'lzw')))
+knit_hooks$set(inline = lbmisc::knitr_inline)
+
+Sys.info()
+
+@ 
+
+\section{Methods}
+
+
+Statistical analysis was conducted using R \cite{R}.
+
+\section{Results}
+
+
+
+
+
+
+% ================================================================================ %
+
+\printbibliography 
+
+\end{document}

@@ -183,6 +183,32 @@ def compile_tex(tex):
     os.system(cmd)
 
 
+def compile_rnw(rnw):
+    """Compile a single Rnw file in src"""
+    link = Path(rnw.name) # current directory
+    tex = link.with_suffix(".tex")
+    if link.exists():
+        link.unlink()
+    link.symlink_to(rnw)
+    print(f"-- Compiling {rnw} --")
+    knit = f"Rscript -e 'knitr::knit(input = \"{link}\", output = \"{tex}\", envir = new.env())'"
+    pdflatex = f"pdflatex {link.stem}"
+    biber = f"biber {link.stem}"
+    pdf_view = f"{pdf_viewer} {link.stem}.pdf"
+    cmd = f"{knit} && {pdflatex} && {biber} && {pdflatex} && {pdflatex} && {pdf_view} &"
+    os.system(cmd)
+
+
+def compile_qmd(qmd):
+    """Compile a single qmd file in src"""
+    link = Path(qmd.name) # current directory
+    if link.exists():
+        link.unlink()
+    link.symlink_to(qmd)
+    print(f"-- Compiling {qmd} --")
+    os.system(f"uv run quarto render {link}")
+
+
 # -----------------------------------------------------------------------------------------------
 # TASKS
 # -----------------------------------------------------------------------------------------------
@@ -377,36 +403,23 @@ def compiletexs(c):
 
 
 @task
-def compileqmds(c):
-    """
-    Compila i file src/*.qmd nella directory radice del progetto con quarto.
-    """
-    qmds = src_dir.glob("*.qmd")
-    for qmd in sorted(qmds):
-        link = Path(qmd.name) # current directory
-        if link.exists():
-            link.unlink()
-        link.symlink_to(qmd)
-        print(f"-- Compiling {qmd} --")
-        c.run(f"uv run quarto render {link}")
-        link.unlink()
-
-
-@task
 def compilernws(c):
     """
     Compila i file src/*.Rnw nella directory radice del progetto con quarto.
     """
     rnws = src_dir.glob("*.Rnw")
     for rnw in sorted(rnws):
-        link = Path(rnw.name) # current directory
-        if link.exists():
-            link.unlink()
-        link.symlink_to(rnw)
-        print(f"-- Compiling {rnw} --")
-        c.run(f"rnw2pdf {link} &")
-        link.unlink()
+        compile_rnw(rnw)
 
+
+@task
+def compileqmds(c):
+    """
+    Compila i file src/*.qmd nella directory radice del progetto con quarto.
+    """
+    qmds = src_dir.glob("*.qmd")
+    for qmd in sorted(qmds):
+        compile_qmd(qmd)
 
 @task
 def tgrep(c):
