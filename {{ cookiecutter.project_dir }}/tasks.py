@@ -393,6 +393,22 @@ def compileqmds(c):
 
 
 @task
+def compilernws(c):
+    """
+    Compila i file src/*.Rnw nella directory radice del progetto con quarto.
+    """
+    rnws = src_dir.glob("*.Rnw")
+    for rnw in sorted(rnws):
+        link = Path(rnw.name) # current directory
+        if link.exists():
+            link.unlink()
+        link.symlink_to(rnw)
+        print(f"-- Compiling {rnw} --")
+        c.run(f"rnw2pdf {link} &")
+        link.unlink()
+
+
+@task
 def tgrep(c):
     """
     Invia il report.pdf via telegram nella chat lavoro.
