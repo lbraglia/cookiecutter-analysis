@@ -363,6 +363,22 @@ def report(c):
         )
     )
 
+@task
+def compileqmds(c):
+    """
+    Compila i file src/*.qmd nella directory radice del progetto con quarto.
+    """
+    # pys = srcpys(prj)
+    qmds = src_dir.glob("*.qmd")
+    for qmd in qmds:
+        link = Path(qmd.name) # current directory
+        if link.exists():
+            link.unlink()
+        link.symlink_to(qmd)
+        print(f"-- Compiling {qmd} --")
+        c.run(f"uv run quarto render {link}")
+        link.unlink()
+
 
 @task
 def tgrep(c):
