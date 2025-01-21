@@ -113,12 +113,10 @@ def import_protocol():
         symlink.symlink_to(outfile.relative_to(docs_dir))
 
 
-
 def create_logseq_page(fpath, metadata):
     pi_surname = metadata["pi"]["surname"]
     pi_name = metadata["pi"]["name"]
     pi_uo = metadata["pi"]["uo"]
-
     prj_description = metadata["project"]["description"]
     prj_acronym = metadata["project"]["acronym"]
     prj_title = metadata["project"]["title"]
@@ -126,11 +124,9 @@ def create_logseq_page(fpath, metadata):
     prj_url = metadata["project"]["url"]
     prj_created = metadata["project"]["created"]
     prj_contatto = metadata["project"]["contatto"]
-
     days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     dow = days[dt.date.fromisoformat(prj_created).weekday()]
     created = f"{prj_created} {dow}"
-
     logseq_template = f"""type:: [[project]]
 area:: [[lavoro]]
 priority:: A
@@ -170,6 +166,22 @@ def uv_init():
     subprocess.run(["uv", "init", "."])
     subprocess.run(["rm", "-rf", "hello.py"])
     subprocess.run(["uv", "add"] + default_prj_requirements)
+
+
+def compile_tex(tex):
+    """Compile a single tex file in src"""
+    link = Path(tex.name) # current directory
+    if link.exists():
+        link.unlink()
+    link.symlink_to(tex)
+    print(f"-- Compiling {tex} --")
+    pdflatex = f"pdflatex {link.stem}"
+    pythontex = f"uv run pythontex {link.stem}"
+    biber = f"biber {link.stem}"
+    pdf_view = f"{pdf_viewer} {link.stem}.pdf"
+    cmd = f"{pdflatex} && {biber} && {pythontex} && {pdflatex} && {pdflatex} && {pdf_view} &"
+    os.system(cmd)
+
 
 # -----------------------------------------------------------------------------------------------
 # TASKS
@@ -218,7 +230,6 @@ def init(c):
     else:
         create_logseq_page(fpath = logseq_page, metadata = metadata)
     return None
-
 
 
 @task
@@ -295,6 +306,7 @@ def edit(c):
     cmd = f"{editor}  {paths_str} & " 
     os.system(cmd)
 
+
 @task
 def venvinit(c):
     """
@@ -302,12 +314,14 @@ def venvinit(c):
     """
     uv_init()
 
+
 @task
 def venvrepl(c):
     """
     Esegue un interprete python nell'environment considerato
     """
     os.system("uv run python")
+
 
 @task
 def venvrefresh(c):
@@ -344,31 +358,29 @@ def runrs(c):
         c.run(cmd)
 
 
-
 @task
 def report(c):
     """
     Esegue pdflatex/pythontex su src/report.tex nella directory radice del progetto e visualizza il pdf.
     """
-    rmln = "rm -rf report.tex"
-    ln = "ln -s src/report.tex"
-    pdflatex = "pdflatex report"
-    pythontex = "uv run pythontex report"
-    # pythontex = "pythontex --interpreter python:.venv/bin/python report"
-    biber = "biber report"
-    pdf_view = f"{pdf_viewer} report.pdf"
-    c.run(
-        "{0} && {1} && {2} && {3} && {4} && {5} && {6} && {7} && {8}".format(
-            rmln, ln, pdflatex, biber, pythontex, pdflatex, pdflatex, pdf_view, clean_cmd
-        )
-    )
+    compile_tex(Path("src/report.tex"))
+
+
+@task
+def compiletexs(c):
+    """
+    Compila i file src/*.qmd nella directory radice del progetto con quarto.
+    """
+    texs = src_dir.glob("*.tex")
+    for tex in texs:
+        compile_tex(tex)
+
 
 @task
 def compileqmds(c):
     """
     Compila i file src/*.qmd nella directory radice del progetto con quarto.
     """
-    # pys = srcpys(prj)
     qmds = src_dir.glob("*.qmd")
     for qmd in qmds:
         link = Path(qmd.name) # current directory
@@ -399,11 +411,9 @@ def zip(c):
     acronym = metadata["project"]["acronym"]
     pi = metadata["pi"]["surname"]
     paste = f"{pi}_{acronym}"
-
     zip_fpath = Path(f"/tmp/{paste}.zip")
     if zip_fpath.exists():
         zip_fpath.unlink()
-
     with ZipFile(zip_fpath, "w") as zip:
         # report
         zip.write(final_report, f"{paste}/report.pdf")
@@ -411,7 +421,6 @@ def zip(c):
         for a in outputs_dir.iterdir():
             if not a.name.startswith("."):
                 zip.write(a, f"{paste}/allegati/{a.name}")
-
 
 
 @task
@@ -437,9 +446,17 @@ def list(c):
     """
     c.run("invoke -l")
 
+
 @task
 def help(c):
     """
     Help di Invoke.
     """
     c.run("invoke -h") 
+
+
+@task
+def updatetasks(c):
+    """Update tasks.py to latest version"""
+    url = "https://raw.githubusercontent.com/lbraglia/cookiecutter-analysis/refs/heads/main/%7B%7B%20cookiecutter.project_dir%20%7D%7D/tasks.py"
+    c.run(f"wget {url}")
