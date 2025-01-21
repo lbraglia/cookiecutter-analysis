@@ -459,4 +459,4 @@ def help(c):
 def updatetasks(c):
     """Update tasks.py to latest version"""
     url = "https://raw.githubusercontent.com/lbraglia/cookiecutter-analysis/refs/heads/main/%7B%7B%20cookiecutter.project_dir%20%7D%7D/tasks.py"
-    c.run(f"wget {url}")
+    c.run(f"wget -O tasks.py {url}")
