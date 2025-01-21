@@ -338,7 +338,7 @@ def runpys(c):
     """
     # pys = srcpys(prj)
     pys = src_dir.glob("*.py")
-    for py in pys:
+    for py in sorted(pys):
         print(f"-- Executing {py} --")
         c.run(f"uv run python {py}")
 
@@ -350,7 +350,7 @@ def runrs(c):
     tmp
     """
     rs = src_dir.glob("*.R")
-    for r in rs:
+    for r in sorted(rs):
         infile = r
         outfile = tmp_dir / (str(r.stem) + ".txt")
         print(f"Executing {infile} (output in {outfile})")
@@ -372,7 +372,7 @@ def compiletexs(c):
     Compila i file src/*.qmd nella directory radice del progetto con quarto.
     """
     texs = src_dir.glob("*.tex")
-    for tex in texs:
+    for tex in sorted(texs):
         compile_tex(tex)
 
 
@@ -382,7 +382,7 @@ def compileqmds(c):
     Compila i file src/*.qmd nella directory radice del progetto con quarto.
     """
     qmds = src_dir.glob("*.qmd")
-    for qmd in qmds:
+    for qmd in sorted(qmds):
         link = Path(qmd.name) # current directory
         if link.exists():
             link.unlink()
