@@ -19,10 +19,11 @@ from tkinter.filedialog import askopenfilename
 # external programs
 editor = "emacs --no-splash -r -fh"
 pdf_viewer = "okular --unique"
-clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *.bcf *.blg *.run.xml *.out *.Rnw"
+clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw"
 
 # libraries needed for any project
-default_prj_requirements = ["pandas", "openpyxl", "--editable", "file:///home/l/.src/pypkg/pylbmisc"]
+# default_prj_requirements = ["pandas", "openpyxl", "--editable", "file:///home/l/.src/pypkg/pylbmisc"]
+default_prj_requirements = ["--editable", "file:///home/l/.src/pypkg/pylbmisc"]
 
 # -----------------------------------------------------------------------------------------------
 # PATHS
@@ -210,7 +211,7 @@ def compile_qmd(qmd):
 
 
 # -----------------------------------------------------------------------------------------------
-# TASKS
+# COMMON TASKS
 # -----------------------------------------------------------------------------------------------
 
 @task
@@ -259,7 +260,7 @@ def init(c):
 
 
 @task
-def impdata(c):
+def adddata(c):
     """
     Importa il dataset nella directory del progetto.
     """
@@ -267,7 +268,7 @@ def impdata(c):
 
 
 @task
-def impprot(c):
+def addprot(c):
     """
     Importa il protocollo nella directory del progetto.
     """
