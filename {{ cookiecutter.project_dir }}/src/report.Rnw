@@ -44,8 +44,6 @@ opts_chunk$set(fig.path    = 'outputs/',
                dev.args    = list(tiff = list(compression = 'lzw')))
 knit_hooks$set(inline = lbmisc::knitr_inline)
 
-Sys.info()
-
 @ 
 
 \section{Methods}
