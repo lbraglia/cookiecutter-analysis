@@ -44,8 +44,8 @@ lb.dm.dump_unique_values(dfs)
 # }
 #
 # # prima di questo passaggio impostare gli indici in dfs per il report dei NA?
-# df  = lb.dm.Coercer(dfs["df"], coercions_df).coerce()
-# df2 = lb.dm.Coercer(dfs["df2"], coercions_df2).coerce()
+# df  = lb.dm.Coercer(dfs["df"], df_coercions).coerce()
+# df2 = lb.dm.Coercer(dfs["df2"], df2_coercions).coerce()
 
 
 # # Export for analysis
