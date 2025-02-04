@@ -1,10 +1,23 @@
 ---
 title: "{{cookiecutter.pi_surname}} - {{cookiecutter.project_acronym}}"
-format: docx
+date: last-modified
+toc: true
+format: 
+  docx:
+    fig-align: center
+    fig-format: png
+    fig-dpi: 600
+    fig-width: 3.346
+    fig-height: 3.346 
 bibliography: 
-   - proj/biblio/common_biblio.bib
-   - proj/biblio/prj_biblio.bib
+  - proj/biblio/common_biblio.bib
+  - proj/biblio/prj_biblio.bib
 output-dir: "outputs"
+execute:
+  echo: false
+  warning: true
+  error: true
+
 ---
 
 ## Funzionalità
