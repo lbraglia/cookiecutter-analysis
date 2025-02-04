@@ -2,13 +2,15 @@
 title: "{{cookiecutter.pi_surname}} - {{cookiecutter.project_acronym}}"
 date: last-modified
 toc: true
+fig-align: center
+fig-width: 3.346
+fig-height: 3.346 
 format: 
+  pdf:
+    pdf-engine: pdflatex
   docx:
-    fig-align: center
     fig-format: png
     fig-dpi: 600
-    fig-width: 3.346
-    fig-height: 3.346 
 bibliography: 
   - proj/biblio/common_biblio.bib
   - proj/biblio/prj_biblio.bib
@@ -17,7 +19,6 @@ execute:
   echo: false
   warning: true
   error: true
-
 ---
 
 ## Funzionalità
