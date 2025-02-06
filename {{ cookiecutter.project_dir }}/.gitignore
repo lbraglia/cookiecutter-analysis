@@ -19,3 +19,4 @@ _codebraid
 /*.tex
 /*.Rnw
 /*.qmd
+.quarto
