@@ -19,7 +19,7 @@ from tkinter.filedialog import askopenfilename
 # external programs
 editor = "emacs --no-splash -r -fh"
 pdf_viewer = "okular --unique"
-clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw"
+clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md"
 
 # libraries needed for any project
 # default_prj_requirements = ["pandas", "openpyxl", "--editable", "file:///home/l/.src/pypkg/pylbmisc"]
@@ -206,8 +206,14 @@ def compile_qmd(qmd):
     if link.exists():
         link.unlink()
     link.symlink_to(qmd)
+    # redirect quarto figures to output
+    output_link = Path(link.stem + "_files")
+    if output_link.exists():
+        link.unlink()
+    output_link.symlink_to("outputs")
     print(f"-- Compiling {qmd} --")
-    os.system(f"uv run quarto render {link}")
+    os.system(f"uv run quarto render {link} --debug")
+    output_link.unlink()
 
 
 # -----------------------------------------------------------------------------------------------
