@@ -340,12 +340,12 @@ def edit(c):
     os.system(cmd)
 
 
-@task
-def venvinit(c):
-    """
-    Inizializza uv
-    """
-    uv_init()
+# @task
+# def venvinit(c):
+#     """
+#     Inizializza uv
+#     """
+#     uv_init()
 
 
 @task
@@ -357,7 +357,7 @@ def venvrepl(c):
 
 
 @task
-def venvrefresh(c):
+def venvsync(c):
     """
     Sincronizza uv per far si che tutte le dipendenze siano soddisfatte
     """
