@@ -396,7 +396,7 @@ def report(c):
     """
     Esegue pdflatex/pythontex su src/report.tex nella directory radice del progetto e visualizza il pdf.
     """
-    compile_tex(Path("src/report.tex"))
+    compile_qmd(Path("src/report.qmd"))
 
 
 @task
