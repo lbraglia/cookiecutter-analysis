@@ -21,3 +21,4 @@ _codebraid
 /*.qmd
 /*.md
 .quarto
+.~lock
