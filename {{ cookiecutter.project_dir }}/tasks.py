@@ -8,7 +8,6 @@ import calendar
 import pylbmisc as lb
 
 from pathlib import Path
-from zipfile import ZipFile
 from invoke import task
 from tkinter.filedialog import askopenfilename
 
@@ -392,10 +391,13 @@ def runrs(c):
 
 
 @task
-def report(c):
+def reportqmd(c):
     """
-    Esegue pdflatex/pythontex su src/report.tex nella directory radice del progetto e visualizza il pdf.
+    Clean degli output e compila src/report.qmd
     """
+    if outputs_dir.exists():
+        shutil.rmtree(outputs_dir)
+        outputs_dir.mkdir()
     compile_qmd(Path("src/report.qmd"))
 
 
@@ -428,6 +430,7 @@ def compileqmds(c):
     for qmd in sorted(qmds):
         compile_qmd(qmd)
 
+
 @task
 def tgrep(c):
     """
@@ -450,13 +453,16 @@ def zip(c):
     zip_fpath = Path(f"/tmp/{paste}.zip")
     if zip_fpath.exists():
         zip_fpath.unlink()
-    with ZipFile(zip_fpath, "w") as zip:
-        # report
-        zip.write(final_report, f"{paste}/report.pdf")
-        # allegati
-        for a in outputs_dir.iterdir():
-            if not a.name.startswith("."):
-                zip.write(a, f"{paste}/allegati/{a.name}")
+    # copy reports in outputs
+    report_pdf = Path("report.pdf")
+    report_docx = Path("report.docx")
+    if report_pdf.exists():
+        shutil.copy(report_pdf, outputs_dir)
+    if report_docx.exists():
+        shutil.copy(report_docx, outputs_dir)
+    shutil.make_archive(str(zip_fpath.with_suffix("")),
+                        format = "zip",
+                        base_dir = outputs_dir)
 
 
 @task
