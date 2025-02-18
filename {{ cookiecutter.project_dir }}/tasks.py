@@ -39,6 +39,7 @@ docs_dir      = root / "proj" / "docs"
 common_biblio = root / "proj" / "biblio" / "common_biblio.bib"
 prj_biblio    = root / "proj" / "biblio" / "prj_biblio.bib"
 final_report  = root / "report.pdf"
+randlistgen = root / "src" / "randomization.py"
 
 # outside project
 brain = Path("~/.brain/pages").expanduser()
@@ -497,8 +498,24 @@ def help(c):
     c.run("invoke -h") 
 
 
+
+def addsomething(url, outfile, overwrite = False):
+    if outfile.exists() and not overwrite:
+        msg = f"File {outfile} already exists, download aborted."
+        print(msg)
+        return None
+    os.system(f"wget -O {outfile} {url}")
+
+
 @task
 def updatetasks(c):
     """Update tasks.py to latest version"""
     url = "https://raw.githubusercontent.com/lbraglia/cookiecutter-analysis/refs/heads/main/%7B%7B%20cookiecutter.project_dir%20%7D%7D/tasks.py"
-    c.run(f"wget -O tasks.py {url}")
+    addsomething(url = url, outfile = Path("tasks.py"), overwrite = True)
+
+
+@task
+def addrandlist(c):
+    """Add randomization.py if not already available."""
+    url = "https://raw.githubusercontent.com/lbraglia/cookiecutter-analysis/refs/heads/main/plugins/randomization.py"
+    addsomething(url = url, outfile = randlistgen, overwrite = False)
