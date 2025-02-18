@@ -3,7 +3,6 @@ import os
 import shutil
 import subprocess
 import datetime as dt
-import calendar
 
 import pylbmisc as lb
 
@@ -285,7 +284,7 @@ def viewdata(c):
     """
     Mostra il dataset ultima versione.
     """
-    cmd = f"libreoffice --calc --view data/raw_dataset.xlsx &"
+    cmd = "libreoffice --calc --view data/raw_dataset.xlsx &"
     os.system(cmd)
 
 
