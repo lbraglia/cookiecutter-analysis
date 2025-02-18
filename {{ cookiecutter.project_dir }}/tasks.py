@@ -514,7 +514,7 @@ def updatetasks(c):
 
 
 @task
-def addplugin(c):
+def addplugins(c):
     """
     Add plugins to current project
     """
