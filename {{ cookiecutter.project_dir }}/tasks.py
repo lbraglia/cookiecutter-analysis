@@ -39,7 +39,6 @@ docs_dir      = root / "proj" / "docs"
 common_biblio = root / "proj" / "biblio" / "common_biblio.bib"
 prj_biblio    = root / "proj" / "biblio" / "prj_biblio.bib"
 final_report  = root / "report.pdf"
-randlistgen = root / "src" / "randomization.py"
 
 # outside project
 brain = Path("~/.brain/pages").expanduser()
@@ -515,7 +514,18 @@ def updatetasks(c):
 
 
 @task
-def addrandlist(c):
-    """Add randomization.py if not already available."""
-    url = "https://raw.githubusercontent.com/lbraglia/cookiecutter-analysis/refs/heads/main/plugins/randomization.py"
-    addsomething(url = url, outfile = randlistgen, overwrite = False)
+def addplugin(c):
+    """
+    Add plugins to current project
+    """
+    baseurl = "https://raw.githubusercontent.com/lbraglia/cookiecutter-analysis/refs/heads/main/plugins/"
+    plugins = ["randomization.py",
+               "estimates_validation.R",
+               "report.Rnw",
+               "report.tex"]
+    choices = lb.utils.menu(title = "Specificare che plugin", choices = plugins)
+    if choices:
+        for f in choices:
+            url = baseurl + f
+            dest = src_dir / f
+            addsomething(url = url, outfile = dest, overwrite = False)
