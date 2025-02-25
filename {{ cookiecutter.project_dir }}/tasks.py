@@ -9,6 +9,7 @@ import pylbmisc as lb
 from pathlib import Path
 from invoke import task
 from tkinter.filedialog import askopenfilename
+from datetime import date
 
 # -----------------------------------------------------------------------------------------------
 # PARAMETERS
@@ -360,6 +361,18 @@ def venvsync(c):
     Sincronizza uv per far si che tutte le dipendenze siano soddisfatte
     """
     os.system("uv sync")
+
+@task
+def venvfreeze(c):
+    """
+    Freeza le dipendenze ad oggi aggiungendo eclude-newer al pyproject.toml.
+    Prima di farlo fare l'update di tutti i pacchetti ed eseguire l'elaborazione
+    per sicurezza
+    """
+    today = date.today().isoformat()
+    string = f"\n\n[tool.uv]\nexclude-newer = '{today}'\n"
+    with open("pyproject.toml", "a") as f:
+        f.write(string)
 
 
 @task
