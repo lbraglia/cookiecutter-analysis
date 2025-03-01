@@ -9,7 +9,6 @@ import pylbmisc as lb
 from pathlib import Path
 from invoke import task
 from tkinter.filedialog import askopenfilename
-from datetime import date
 
 # -----------------------------------------------------------------------------------------------
 # PARAMETERS
@@ -18,7 +17,8 @@ from datetime import date
 # external programs
 editor = "emacs --no-splash -r -fh"
 pdf_viewer = "okular --unique"
-clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-* *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md"
+clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-*" \
+    " *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md"
 
 # libraries needed for any project
 # default_prj_requirements = ["pandas", "openpyxl", "--editable", "file:///home/l/.src/pypkg/pylbmisc"]
@@ -47,6 +47,7 @@ brain = Path("~/.brain/pages").expanduser()
 # UTILS
 # -----------------------------------------------------------------------------------------------
 
+
 def get_metadata():
     """Read/parse the project .ini file containing information inserted during
     project creation."""
@@ -54,6 +55,15 @@ def get_metadata():
     metadata = configparser.ConfigParser()
     metadata.read(ini_path)
     return metadata
+
+
+def addsomething(url, outfile, overwrite = False):
+    """Function to downloa stuff (plugin or udpdated tasks.py)"""
+    if outfile.exists() and not overwrite:
+        msg = f"File {outfile} already exists, download aborted."
+        print(msg)
+        return None
+    os.system(f"wget -O {outfile} {url}")
 
 
 def import_data():
@@ -214,10 +224,10 @@ def compile_qmd(qmd):
     os.system(f"uv run quarto render {link} --debug")
     output_link.unlink()
 
-
 # -----------------------------------------------------------------------------------------------
 # COMMON TASKS
 # -----------------------------------------------------------------------------------------------
+
 
 @task
 def clean(c):
@@ -321,30 +331,9 @@ def edit(c):
     """
     Edita i file rilevanti del progetto con Emacs.
     """
-    # non so perché dia error invoke, da debuggare quando si ha piu tempo
-    # src_py  = src_dir.glob("*.py")
-    # src_r   = src_dir.glob("*.R")
-    # src_qmd = src_dir.glob("*.qmd")
-    # src_rnw = src_dir.glob("*.Rnw")
-    # py   = list(src_py)
-    # r    = list(src_r)
-    # qmd  = list(src_qmd)
-    # rnw  = list(src_rnw)
-    # all_files = [str(f) for f in py + r + qmd + rnw]
-    # ignore = [str(src_dir / f) for f in ["src/__init__.py", "src/_region_.tex"]]
-    # edit_files = [f for f in all_files if f not in ignore]
-    # paths_str = " ".join(edit_files)
     paths_str  = str(src_dir / "*")
     cmd = f"{editor}  {paths_str} & " 
     os.system(cmd)
-
-
-# @task
-# def venvinit(c):
-#     """
-#     Inizializza uv
-#     """
-#     uv_init()
 
 
 @task
@@ -362,6 +351,7 @@ def venvsync(c):
     """
     os.system("uv sync")
 
+
 @task
 def venvfreeze(c):
     """
@@ -369,8 +359,9 @@ def venvfreeze(c):
     Prima di farlo fare l'update di tutti i pacchetti ed eseguire l'elaborazione
     per sicurezza
     """
-    today = date.today().isoformat()
-    string = f"\n\n[tool.uv]\nexclude-newer = '{today}'\n"
+    # today = date.today().isoformat()
+    now = dt.datetime.now(dt.timezone.utc)
+    string = f"\n\n[tool.uv]\nexclude-newer = '{now.isoformat()}'\n"
     with open("pyproject.toml", "a") as f:
         f.write(string)
 
@@ -506,16 +497,7 @@ def help(c):
     """
     Help di Invoke.
     """
-    c.run("invoke -h") 
-
-
-
-def addsomething(url, outfile, overwrite = False):
-    if outfile.exists() and not overwrite:
-        msg = f"File {outfile} already exists, download aborted."
-        print(msg)
-        return None
-    os.system(f"wget -O {outfile} {url}")
+    c.run("invoke -h")
 
 
 @task
