@@ -4,7 +4,6 @@
 *.blg
 *.log
 *.out
-*.pdf
 *.pytxcode
 *.run.xml
 *.toc
@@ -16,9 +15,11 @@ tmp
 __pycache__
 _codebraid
 /*.docx
+/*.pdf
 /*.tex
 /*.Rnw
 /*.qmd
+
+/.quarto/
 /*.md
-.quarto
-.~lock
+.~lock*
