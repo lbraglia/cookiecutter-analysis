@@ -19,6 +19,7 @@ _codebraid
 /*.tex
 /*.Rnw
 /*.qmd
+/*.quarto_ipynb
 
 /.quarto/
 /*.md
