@@ -211,18 +211,20 @@ def compile_rnw(rnw):
 
 def compile_qmd(qmd):
     """Compile a single qmd file in src"""
-    link = Path(qmd.name) # current directory
+    link = Path(qmd.name)  # link of eg report.qmd to src/report.qmd
     if link.exists():
         link.unlink()
     link.symlink_to(qmd)
     # redirect quarto figures to output
     output_link = Path(link.stem + "_files")
     if output_link.exists():
-        link.unlink()
+        output_link.unlink()
     output_link.symlink_to("outputs")
     print(f"-- Compiling {qmd} --")
     os.system(f"uv run quarto render {link} --debug")
-    output_link.unlink()
+    if output_link.exists():
+        output_link.unlink()
+
 
 # -----------------------------------------------------------------------------------------------
 # COMMON TASKS
