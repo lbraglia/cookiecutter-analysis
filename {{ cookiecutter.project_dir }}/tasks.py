@@ -22,7 +22,7 @@ clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-*" \
 
 # libraries needed for any project
 # default_prj_requirements = ["pandas", "openpyxl", "--editable", "file:///home/l/.src/pypkg/pylbmisc"]
-default_prj_requirements = ["--editable", "file:///home/l/.src/pypkg/pylbmisc"]
+default_prj_requirements = ["jupyter", "--editable", "file:///home/l/.src/pypkg/pylbmisc"]
 
 # -----------------------------------------------------------------------------------------------
 # PATHS
