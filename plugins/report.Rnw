@@ -43,6 +43,7 @@ opts_chunk$set(fig.path    = 'outputs/',
                # compressione lossless dei tiff
                dev.args    = list(tiff = list(compression = 'lzw')))
 knit_hooks$set(inline = lbmisc::knitr_inline)
+wb <- openxlsx::createWorkbook() ## raw tables
 
 @ 
 
@@ -61,5 +62,11 @@ Statistical analysis was conducted using R \cite{R}.
 % ================================================================================ %
 
 \printbibliography 
+
+<<>>=
+
+wb_to_xl(wb = wb, file = 'outputs/tabelle.xlsx')
+
+@ 
 
 \end{document}
