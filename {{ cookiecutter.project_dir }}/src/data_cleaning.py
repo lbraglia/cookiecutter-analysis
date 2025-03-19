@@ -1,5 +1,5 @@
 import pylbmisc as lb
-from pylbmisc.utils import table, dput, interactive
+from pylbmisc.utils import dput, interactive, table, view
 import pprint
 # from functools import reduce
 
@@ -62,6 +62,7 @@ df_coercions = {
 
 
 # # single dataset
+dfs = dfs.set_index("sud_codpaz")
 df = lb.dm.Coercer(dfs, df_coercions).coerce()
 # # multiple datasets
 # df  = lb.dm.Coercer(dfs["df"], df_coercions).coerce()
