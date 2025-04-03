@@ -25,8 +25,6 @@
 
 library(knitr)   # necessario per setup knitr
 library(lbmisc)  # necessario per lbmisc::knitr_inline
-
-## setup knitr
 opts_chunk$set(fig.path    = 'outputs/',
                fig.align   = 'center',
                size        = 'small',
@@ -43,6 +41,8 @@ opts_chunk$set(fig.path    = 'outputs/',
                # compressione lossless dei tiff
                dev.args    = list(tiff = list(compression = 'lzw')))
 knit_hooks$set(inline = lbmisc::knitr_inline)
+rm(list = ls(all = TRUE))
+source("tmp/clean_df.R")
 wb <- openxlsx::createWorkbook() ## raw tables
 
 @ 
