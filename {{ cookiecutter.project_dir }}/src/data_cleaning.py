@@ -10,7 +10,8 @@ dfs = lb.io.import_data("data/raw_dataset.xlsx")
 
 # # Sanitize variable names, keeping as comment
 # # -------------------------------------------
-dfs, comments = lb.dm.sanitize_varnames(dfs)
+dfs, comments = lb.dm.fix_varnames(dfs, return_tfd=True)
+
 if interactive():
     if isinstance(dfs, dict):
         print(list(dfs.keys()))
