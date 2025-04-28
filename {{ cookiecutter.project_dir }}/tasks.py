@@ -395,7 +395,7 @@ def runrs(c):
         c.run(cmd)
 
 
-@task
+@task(default=True)  # spostare nell'azione di default per compilazione report
 def reportqmd(c):
     """
     Clean degli output e compila src/report.qmd
