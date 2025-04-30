@@ -16,7 +16,7 @@ from tkinter.filedialog import askopenfilename
 
 # external programs
 editor = "emacs --no-splash -r -fh"
-pdf_viewer = "okular --unique"
+pdf_viewer = "evince"
 clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-*" \
     " *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md"
 
