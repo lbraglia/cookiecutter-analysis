@@ -97,7 +97,10 @@ df = lb.dm.Coercer(dfs, df_coercions).coerce()
 
 # # Variabili derivate
 # # ------------------
-
+df = df.assign(
+    x=lambda _df: (_df.whatever).astype(""),
+    y=lambda _df: (_df.whatever).astype("")
+)
 
 # # Keep-rename for final datasets
 # # ------------------------------
