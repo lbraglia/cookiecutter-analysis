@@ -130,7 +130,7 @@ def create_logseq_page(fpath, metadata):
     prj_description = metadata["project"]["description"]
     prj_acronym = metadata["project"]["acronym"]
     prj_title = metadata["project"]["title"]
-    prj_dir = metadata["project"]["dir"]
+    # prj_dir = metadata["project"]["dir"]
     prj_url = metadata["project"]["url"]
     prj_created = metadata["project"]["created"]
     prj_contatto = metadata["project"]["contatto"]
@@ -142,13 +142,13 @@ area:: [[lavoro]]
 priority:: A
 description:: {prj_description}
 tags:: fase1 | fase2 | fase3 | fase4, 1braccio | 2bracci | +2bracci, superiorità | non-inferiorità | equivalenza, coorte | caso-controllo | cross-sectional, eziologico | diagnostico | trattamento | prognostico, prospettico | retrospettivo
+noteworthy:: 
 created:: [[{created}]]
 project-title:: {prj_title}
 project-acronym:: {prj_acronym}
-project-PI:: {pi_surname} {pi_name}
-project-contatto:: {prj_contatto}
-pi-struttura:: {pi_uo}
-project-directory:: [here](file:///home/l/projects/{prj_dir})
+project-pi:: {pi_surname} {pi_name} @
+pi-struttura:: {pi_uo} <>
+project-altri-contatti:: {prj_contatto} @
 project-repo:: [here]({prj_url})
 project-ndatasets:: 1
 -
