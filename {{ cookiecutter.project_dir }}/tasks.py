@@ -174,7 +174,7 @@ project-ndatasets:: 1
 def uv_init():
     os.system("rm -rf .venv uv.lock pyproject.toml")
     subprocess.run(["uv", "init", "."])
-    subprocess.run(["rm", "-rf", "hello.py"])
+    subprocess.run(["rm", "-rf", "main.py"])
     subprocess.run(["uv", "add"] + default_prj_requirements)
 
 
