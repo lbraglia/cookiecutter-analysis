@@ -158,14 +158,12 @@ project-ndatasets:: 1
 - ## Log
 	-
 -
-- ## Appunti
-	-
--
 - ## Meetings
 	-
 -
-- ## Mail
+- ## Appunti
 	-
+-
 """
     with open(fpath, "w") as f:
         print(logseq_template, file = f)
