@@ -139,7 +139,6 @@ def create_logseq_page(fpath, metadata):
     created = f"{prj_created} {dow}"
     logseq_template = f"""type:: [[project]]
 area:: [[lavoro]]
-priority:: A
 description:: {prj_description}
 tags:: fase1 | fase2 | fase3 | fase4, 1braccio | 2bracci | +2bracci, superiorità | non-inferiorità | equivalenza, coorte | caso-controllo | cross-sectional, eziologico | diagnostico | trattamento | prognostico, prospettico | retrospettivo
 noteworthy:: 
