@@ -1,6 +1,8 @@
 import pylbmisc as lb
-from pylbmisc.utils import dput, interactive, table, view
 import pprint
+from pylbmisc.utils import is_interactive, view
+from pylbmisc.r import table, dput
+import pandas as pd
 # from functools import reduce
 
 # # Data import
@@ -12,9 +14,29 @@ dfs = lb.io.import_data("data/raw_dataset.xlsx")
 # # -------------------------------------------
 dfs, comments = lb.dm.fix_varnames(dfs, return_tfd=True)
 
-if interactive():
+if is_interactive():
     if isinstance(dfs, dict):
         print(list(dfs.keys()))
+
+
+# # Renaming eventuale per evitare che il codice a valle si sporchi
+# # ---------------------------------------------------------------
+# ft = {
+#     "categoria_ecografica_finale": "eco",
+#     "eta": "age",
+#     "sesso_0_f_1_m": "sex",
+#     "anno": "year",
+#     "fumo_0_attivo_1_pregresso_2_mai": "smoke",
+# }
+# dfs = dfs.rename(columns=ft)
+
+# rimozione variabili da non considerare
+# --------------------------------------
+# rm = ["scanner_y", "outcome_finale_y",
+#       "aace_ace_ame", "eu_tirads",
+#       "suv_max"
+# ]
+# dfs = dfs.drop(columns = rm)
 
 
 # # Unique values inspection/monitoring
@@ -25,7 +47,7 @@ lb.dm.dump_unique_values(dfs)
 # # Type coercions: help(lb.dm.Coercer)
 # # -----------------------------------
 # # dput variable names
-if interactive():
+if is_interactive():
     # multiple datasets
     if isinstance(dfs, dict):
         for k, df in dfs.items():
@@ -68,6 +90,10 @@ df = lb.dm.Coercer(dfs, df_coercions).coerce()
 # # multiple datasets
 # df  = lb.dm.Coercer(dfs["df"], df_coercions).coerce()
 # df2 = lb.dm.Coercer(dfs["df2"], df2_coercions).coerce()
+
+# stringhe rimanenti
+df.select_dtypes("string[pyarrow]").columns.to_list()
+
 
 
 # # variable renaming for multiple dataset
