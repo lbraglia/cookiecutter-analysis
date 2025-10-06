@@ -3,6 +3,9 @@ import pprint
 from pylbmisc.utils import is_interactive, view
 from pylbmisc.r import table, dput
 import pandas as pd
+from src.include import *
+testing = lb.utils.is_interactive()
+
 # from functools import reduce
 
 # # Data import
@@ -14,7 +17,7 @@ dfs = lb.io.import_data("data/raw_dataset.xlsx")
 # # -------------------------------------------
 dfs, comments = lb.dm.fix_varnames(dfs, return_tfd=True)
 
-if is_interactive():
+if testing:
     if isinstance(dfs, dict):
         print(list(dfs.keys()))
 
@@ -47,7 +50,7 @@ lb.dm.dump_unique_values(dfs)
 # # Type coercions: help(lb.dm.Coercer)
 # # -----------------------------------
 # # dput variable names
-if is_interactive():
+if testing:
     # multiple datasets
     if isinstance(dfs, dict):
         for k, df in dfs.items():
