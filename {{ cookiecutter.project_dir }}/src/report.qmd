@@ -30,10 +30,6 @@ from src.include import *
 # import matplotlib.pyplot as plt
 # import pandas as pd
 # import tableone
-# import sys
-# import forestplot as fp
-# from lifelines import CoxPHFitter
-# from scipy.stats import binomtest
 # Attiva il testing solo se su emacs/uv, non su quarto (compilazione)
 testing = lb.utils.is_interactive()
 df = pd.read_pickle("tmp/clean_df.pkl")
