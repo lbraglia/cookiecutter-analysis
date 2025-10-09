@@ -5,12 +5,11 @@ toc: true
 fig-align: center
 fig-width: 3.346
 fig-height: 3.346 
+fig-format: png
+fig-dpi: 600
 format: 
   pdf:
     pdf-engine: pdflatex
-  docx:
-    fig-format: png
-    fig-dpi: 600
 bibliography: 
   - proj/biblio/common_biblio.bib
   - proj/biblio/prj_biblio.bib
