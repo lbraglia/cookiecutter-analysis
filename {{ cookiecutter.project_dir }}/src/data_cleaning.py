@@ -1,9 +1,6 @@
-import pylbmisc as lb
 import pprint
-from pylbmisc.utils import is_interactive, view
-from pylbmisc.r import table, dput
-import pandas as pd
-from src.include import *
+import pylbmisc as lb
+from pylbmisc.r import *
 testing = lb.utils.is_interactive()
 
 # from functools import reduce

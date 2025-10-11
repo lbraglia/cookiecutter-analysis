@@ -24,16 +24,17 @@ jupyter: python3
 ```{python}
 #| label: setup
 
-import pylbmisc as lb
-from pylbmisc.r import table, dput
-from src.include import *
-# import matplotlib.pyplot as plt
+# import numpy as np
 # import pandas as pd
+# import matplotlib.pyplot as plt
 # import tableone
+import pylbmisc as lb
+from pylbmisc.r import *
 # Attiva il testing solo se su emacs/uv, non su quarto (compilazione)
 testing = lb.utils.is_interactive()
 df = pd.read_pickle("tmp/clean_df.pkl")
 # tab = dict() # output tables
+
 ```
 
 
@@ -42,7 +43,6 @@ df = pd.read_pickle("tmp/clean_df.pkl")
 
 ```{python}
 #| label: export-tables
-
 lb.io.export_data(tab, "outputs/tables.xlsx", index = True)
 ```
 
