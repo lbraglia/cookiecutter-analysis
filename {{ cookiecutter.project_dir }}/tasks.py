@@ -21,8 +21,7 @@ clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-*" \
     " *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md"
 
 # libraries needed for any project
-# default_prj_requirements = ["pandas", "openpyxl", "--editable", "file:///home/l/.src/pypkg/pylbmisc"]
-default_prj_requirements = ["jupyter", "--editable", "file:///home/l/.src/pypkg/pylbmisc"]
+default_prj_requirements = ["jupyter"]  # for quarto I guess
 
 # -----------------------------------------------------------------------------------------------
 # PATHS
@@ -57,7 +56,7 @@ def get_metadata():
     return metadata
 
 
-def addsomething(url, outfile, overwrite = False):
+def addsomething(url, outfile, overwrite=False):
     """Function to downloa stuff (plugin or udpdated tasks.py)"""
     if outfile.exists() and not overwrite:
         msg = f"File {outfile} already exists, download aborted."
@@ -70,9 +69,9 @@ def import_data():
     """
     Import latest dataset and set up proper symlinks.
     """
-    dataset_date = input(
-        "Insert date of the data extraction (YYYY-MM-DD) or leave blank to skip: "
-    ).replace("-", "_")
+    msg = "Insert date of the data extraction " \
+        "(YYYY-MM-DD) or leave blank to skip: "
+    dataset_date = input(msg).replace("-", "_")
     if dataset_date != "":
         outfile = data_dir / f"raw_dataset_{dataset_date}.xlsx"
         symlink = data_dir / "raw_dataset.xlsx"
@@ -80,7 +79,8 @@ def import_data():
         initialdir = "/tmp"
         filetypes = [("Formati", ".csv .xls .xlsx .zip")]
         fpaths = askopenfilename(
-            title=title, initialdir=initialdir, filetypes=filetypes, multiple=True
+            title=title, initialdir=initialdir,
+            filetypes=filetypes, multiple=True
         )
         # import data
         dfs = lb.io.import_data(fpaths)
@@ -96,7 +96,8 @@ def import_protocol():
     """
     Import latest protocol and set up proper symlinks
     """
-    msg = "Insert date of the study protocol (YYYY-MM-DD) or leave blank to skip: "
+    msg = "Insert date of the study protocol " \
+        "(YYYY-MM-DD) or leave blank to skip: "
     protocol_date = input(msg).replace("-", "_")
     if protocol_date != "":
         outfile = docs_dir / f"protocol_{protocol_date}.pdf"
@@ -104,9 +105,9 @@ def import_protocol():
         title = "Select the study protocol file to be imported"
         initialdir = "/tmp"
         filetypes = [("Formati", ".docx .doc .pdf")]
-        fpath = Path(
-            askopenfilename(title=title, initialdir=initialdir, filetypes=filetypes)
-        )
+        fpath = Path(askopenfilename(title=title,
+                                     initialdir=initialdir,
+                                     filetypes=filetypes))
         if fpath.suffix == ".pdf":
             # just copy the .pdf file
             shutil.copy(fpath, outfile.absolute())
@@ -172,6 +173,7 @@ def uv_init():
     os.system("rm -rf .venv uv.lock pyproject.toml")
     subprocess.run(["uv", "init", "."])
     subprocess.run(["rm", "-rf", "main.py"])
+    subprocess.run(["uv", "add", "--editable", "file:///home/l/.src/pypkg/pylbmisc"])
     subprocess.run(["uv", "add"] + default_prj_requirements)
 
 
