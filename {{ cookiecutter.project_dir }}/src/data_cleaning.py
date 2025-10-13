@@ -1,9 +1,6 @@
-import pprint
 import pylbmisc as lb
 from pylbmisc.r import *
-
 testing = lb.utils.is_interactive()
-
 # from functools import reduce
 
 # # Data import
@@ -48,14 +45,7 @@ lb.dm.dump_unique_values(dfs)
 # # Type coercions: help(lb.dm.Coercer)
 # # -----------------------------------
 # # dput variable names
-if testing:
-    # multiple datasets
-    if isinstance(dfs, dict):
-        for k, df in dfs.items():
-            print(k, "\n")
-            pprint.pp(df.columns.to_list())
-    else:
-        pprint.pp(dfs.columns.to_list())
+lb.dm.names_list(dfs)
 
 
 # prepare coercion
@@ -78,6 +68,9 @@ stato_civile = lb.dm.mc(
 
 
 df_coercions = {
+    # variabili che si vogliono tenere immodificate con keep_coerced_only in
+    # Coercer.coerce sotto identity    
+    # lb.dm.identity: [],
     lb.dm.to_sex: ["sex"],
     to_variable: ["variable"],
     livello_educativo: ["titstu"],
