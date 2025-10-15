@@ -20,8 +20,8 @@ pdf_viewer = "evince"
 clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-*" \
     " *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md"
 
-# libraries needed for any project
-default_prj_requirements = ["jupyter"]  # for quarto I guess
+# libraries needed for any project (for quarto and to df.to_markdown)
+default_prj_requirements = ["jupyter", "tabulate"]
 
 # -----------------------------------------------------------------------------------------------
 # PATHS
