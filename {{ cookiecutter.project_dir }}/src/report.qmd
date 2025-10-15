@@ -16,8 +16,8 @@ bibliography:
 output-dir: "outputs"
 execute:
   echo: false
-  warning: true
-  error: true
+  warning: false
+  error: false
 jupyter: python3
 ---
 
