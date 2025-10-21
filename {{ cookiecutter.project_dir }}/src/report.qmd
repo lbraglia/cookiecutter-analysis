@@ -34,7 +34,7 @@ from pylbmisc.r import *
 # Attiva il testing solo se su emacs/uv, non su quarto (compilazione)
 testing = lb.utils.is_interactive()
 df = pd.read_pickle("tmp/clean_df.pkl")
-# tab = OrderedDict() # output tables
+# exported_tab = OrderedDict() # output tables
 
 ```
 
@@ -44,6 +44,8 @@ df = pd.read_pickle("tmp/clean_df.pkl")
 
 ```{python}
 #| label: export-tables
-lb.io.export_data(tab, "outputs/tables.xlsx", index = True)
+
+# lb.io.export_data(exported_tab, "outputs/tables.xlsx", index = True)
+
 ```
 
