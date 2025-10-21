@@ -30,10 +30,11 @@ jupyter: python3
 # import tableone
 import pylbmisc as lb
 from pylbmisc.r import *
+# from collections import OrderedDict
 # Attiva il testing solo se su emacs/uv, non su quarto (compilazione)
 testing = lb.utils.is_interactive()
 df = pd.read_pickle("tmp/clean_df.pkl")
-# tab = dict() # output tables
+# tab = OrderedDict() # output tables
 
 ```
 
