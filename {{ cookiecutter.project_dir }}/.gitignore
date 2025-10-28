@@ -25,3 +25,4 @@ _codebraid
 /*.md
 .~lock*
 uv.lock
+.RData
