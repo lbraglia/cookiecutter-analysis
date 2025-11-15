@@ -25,6 +25,7 @@
 
 library(knitr)   # necessario per setup knitr
 library(lbmisc)  # necessario per lbmisc::knitr_inline
+knit_engines$set(python = reticulate::eng_python)
 opts_chunk$set(fig.path    = 'outputs/',
                fig.align   = 'center',
                size        = 'small',
