@@ -5,7 +5,8 @@ testing = lb.utils.is_interactive()
 
 # # Data import
 # # -----------
-dfs = lb.io.import_data("data/raw_dataset.xlsx")
+dfs = lb.io.import_data("data/raw_dataset.xlsx") # multiple custom dataset
+df = lb.io.import_redcap()  # redcap export (data/DATA.csv, data/LABELS.csv)
 
 
 # # Sanitize variable names, keeping as comment
