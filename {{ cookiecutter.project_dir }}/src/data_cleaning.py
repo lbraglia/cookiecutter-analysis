@@ -1,21 +1,25 @@
 import pylbmisc as lb
 from pylbmisc.r import *
+import pprint
 testing = lb.utils.is_interactive()
 # from functools import reduce
 
 # # Data import
 # # -----------
-dfs = lb.io.import_data("data/raw_dataset.xlsx") # multiple custom dataset
-df = lb.io.import_redcap()  # redcap export (data/DATA.csv, data/LABELS.csv)
+# # standard old import
+# dfs = lb.io.import_data("data/raw_dataset.xlsx") # multiple custom dataset
 
+# redcap export import (data/DATA.csv, data/LABELS.csv)
+df, vd = lb.io.import_redcap() # dataframe and variable description
+pprint.pp(vd)
 
-# # Sanitize variable names, keeping as comment
-# # -------------------------------------------
-dfs, comments = lb.dm.fix_varnames(dfs, return_tfd=True)
+# # # Sanitize variable names, keeping as comment
+# # # -------------------------------------------
+# dfs, comments = lb.dm.fix_varnames(dfs, return_tfd=True)
 
-if testing:
-    if isinstance(dfs, dict):
-        print(list(dfs.keys()))
+# if testing:
+#     if isinstance(dfs, dict):
+#         print(list(dfs.keys()))
 
 
 # # Renaming eventuale per evitare che il codice a valle si sporchi
