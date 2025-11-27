@@ -92,6 +92,48 @@ def import_data():
         symlink.symlink_to(outfile.relative_to(data_dir))
 
 
+def _setup_redcap_file(input_path, is_label):
+    """Copia e crea i link per i file esportati da redcap (sia dati che labels)"""
+    outfile = data_dir / input_path.name
+    if is_label:
+        symlink = data_dir / "LABELS.csv"
+        old_symlink = data_dir / "OLD_LABELS.csv"
+    else:
+        symlink = data_dir / "DATA.csv"
+        old_symlink = data_dir / "OLD_DATA.csv"
+    # rm old symlink
+    if symlink.exists():
+        symlink.rename(old_symlink)
+    # cp data
+    shutil.copy(input_path, outfile)
+    # add symlink
+    symlink.symlink_to(outfile.relative_to(data_dir))
+
+
+def import_redcap():
+    """
+    Import latest redcap export (both DATA and LABELS) and set up proper symlinks.
+    """
+    # tk-dialogbox
+    title = "Select the two csvs for DATA and LABELS exported from RedCAP" \
+        "'Data Exports, Reports, and Stats' -> 'Export Data'" \
+        " -> 'Download raw data and labesls'"
+    initialdir = "/home/l/"
+    filetypes = [("Formati", ".csv")]
+    fpaths = askopenfilename(
+        title=title, initialdir=initialdir,
+        filetypes=filetypes, multiple=True
+    )
+    if len(fpaths) != 2:
+        msg = "Stoppo: devono essere selezionati 2 csv," \
+            " uno per DATA e uno per LABELS."
+        raise ValueError(msg)
+    fpaths = [Path(p) for p in fpaths]
+    labels = ["_DATA_LABELS_" in p.stem for p in fpaths]
+    for i in range(len(fpaths)):
+        _setup_redcap_file(input_path=fpaths[i], is_label=labels[i])
+
+
 def import_protocol():
     """
     Import latest protocol and set up proper symlinks
@@ -250,12 +292,18 @@ def init(c):
         os.symlink("/home/l/texmf/tex/latex/biblio/biblio.bib",
                    common_biblio.absolute())
     subprocess.run(["touch", str(prj_biblio)])
+    # # -----------------------------------------------------------
+    # NON FATTI PIU QUI perché
+    # 1) quando inizializzo tipicamente non ho il dataset di analisi o il
+    #    protocollo (almeno prospetticamente)
+    # 2) per i dataset decido da linea di comando se importare dataset vari o
+    #    da redcap
+    #
+    # print("Importing protocol")
+    # import_protocol()
     # -----------------------------------------------------------
-    print("Importing protocol")
-    import_protocol()
-    # -----------------------------------------------------------
-    print("Importing dataset")
-    import_data()
+    # print("Importing dataset")
+    # import_data()
     # -----------------------------------------------------------
     print("UV init")
     uv_init()
@@ -271,16 +319,24 @@ def init(c):
     if logseq_page.exists():
         print("logseq page already available, skipping.")
     else:
-        create_logseq_page(fpath = logseq_page, metadata = metadata)
+        create_logseq_page(fpath=logseq_page, metadata=metadata)
     return None
 
 
 @task
-def adddata(c):
+def adddataold(c):
     """
     Importa il dataset nella directory del progetto.
     """
     import_data()
+
+
+@task
+def addredcapexport(c):
+    """
+    Importa il dataset nella directory del progetto.
+    """
+    import_redcap()
 
 
 @task
@@ -296,8 +352,13 @@ def viewdata(c):
     """
     Mostra il dataset ultima versione.
     """
-    cmd = "libreoffice --calc --view data/raw_dataset.xlsx &"
-    os.system(cmd)
+    possible_datasets = ["data/raw_dataset.xlsx", "data/LABELS.csv"]
+    available = [d for d in possible_datasets if os.path.exists(d)]
+    if len(available):
+        cmd = f"libreoffice --calc --view {' '.join(available)} &"
+        os.system(cmd)
+    else:
+        print("No datasets imported yet.")
 
 
 @task
