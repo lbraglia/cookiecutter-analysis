@@ -466,6 +466,17 @@ def reportqmd(c):
     compile_qmd(Path("src/report.qmd"))
 
 
+@task()
+def reportrnw(c):
+    """
+    Clean degli output e compila src/report.Rnw
+    """
+    if outputs_dir.exists():
+        shutil.rmtree(outputs_dir)
+        outputs_dir.mkdir()
+    compile_rnw(Path("src/report.Rnw"))
+
+
 @task
 def compiletexs(c):
     """
