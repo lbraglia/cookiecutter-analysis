@@ -44,6 +44,7 @@ opts_chunk$set(fig.path    = 'outputs/',
 knit_hooks$set(inline = lbmisc::knitr_inline)
 rm(list = ls(all = TRUE))
 source("tmp/clean_df.R")
+## df <- as.data.frame(feather::read_feather("tmp/clean_df.feather"))
 wb <- openxlsx::createWorkbook() ## raw tables
 
 @ 
