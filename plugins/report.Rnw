@@ -52,7 +52,7 @@ wb <- openxlsx::createWorkbook() ## raw tables
 \section{Methods}
 
 
-Statistical analysis was conducted using R \cite{R}.
+Statistical analysis was conducted using R \cite{rcoreteam2025languageenvironmentstatistical}.
 
 \section{Results}
 
