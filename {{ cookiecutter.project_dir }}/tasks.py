@@ -229,8 +229,9 @@ def compile_tex(tex):
     pdflatex = f"pdflatex {link.stem}"
     pythontex = f"uv run pythontex {link.stem}"
     biber = f"biber {link.stem}"
-    pdf_view = f"{pdf_viewer} {link.stem}.pdf"
-    cmd = f"{pdflatex} && {biber} && {pythontex} && {pdflatex} && {pdflatex} && {pdf_view} &"
+    cmd = f"{pdflatex} && {biber} && {pythontex} && {pdflatex} && {pdflatex}"
+    # pdf_view = f"{pdf_viewer} {link.stem}.pdf"
+    # cmd = f"{pdflatex} && {biber} && {pythontex} && {pdflatex} && {pdflatex} && {pdf_view} &"
     os.system(cmd)
 
 
@@ -245,8 +246,9 @@ def compile_rnw(rnw):
     knit = f"Rscript -e 'knitr::knit(input = \"{link}\", output = \"{tex}\", envir = new.env())'"
     pdflatex = f"pdflatex {link.stem}"
     biber = f"biber {link.stem}"
-    pdf_view = f"{pdf_viewer} {link.stem}.pdf"
-    cmd = f"{knit} && {pdflatex} && {biber} && {pdflatex} && {pdflatex} && {pdf_view} &"
+    # pdf_view = f"{pdf_viewer} {link.stem}.pdf"
+    # cmd = f"{knit} && {pdflatex} && {biber} && {pdflatex} && {pdflatex} && {pdf_view} &"
+    cmd = f"{knit} && {pdflatex} && {biber} && {pdflatex} && {pdflatex}"
     os.system(cmd)
 
 
@@ -273,11 +275,124 @@ def compile_qmd(qmd):
 
 
 @task
+def add_data_old(c):
+    """
+    Importa il dataset nella directory del progetto.
+    """
+    import_data()
+
+
+@task
+def add_data_redcap(c):
+    """
+    Importa il dataset nella directory del progetto.
+    """
+    import_redcap()
+
+
+@task
+def add_plugins(c):
+    """
+    Add plugins to current project
+    """
+    baseurl = "https://raw.githubusercontent.com/lbraglia/" \
+        "cookiecutter-analysis/refs/heads/main/plugins/"
+    plugins = ["randomization.py",
+               "estimates_validation.R",
+               "report.Rnw",
+               "report.tex"]
+    choices = lb.utils.menu(title="Specificare che plugin", choices=plugins)
+    if choices:
+        for f in choices:
+            url = baseurl + f
+            dest = src_dir / f
+            addsomething(url=url, outfile=dest, overwrite=False)
+
+
+@task
+def add_protocol(c):
+    """
+    Importa il protocollo nella directory del progetto.
+    """
+    import_protocol()
+
+
+@task
 def clean(c):
     """
     Pulisce la directory del progetto.
     """
     c.run(clean_cmd)
+
+
+@task
+def compile_all_qmds(c):
+    """
+    Compila i file src/*.qmd nella directory radice del progetto con quarto.
+    """
+    qmds = src_dir.glob("*.qmd")
+    for qmd in sorted(qmds):
+        compile_qmd(qmd)
+
+
+@task
+def compile_all_rnws(c):
+    """
+    Compila i file src/*.Rnw nella directory radice del progetto con quarto.
+    """
+    rnws = src_dir.glob("*.Rnw")
+    for rnw in sorted(rnws):
+        compile_rnw(rnw)
+
+
+@task
+def compile_all_texs(c):
+    """
+    Compila i file src/*.qmd nella directory radice del progetto con quarto.
+    """
+    texs = src_dir.glob("*.tex")
+    for tex in sorted(texs):
+        compile_tex(tex)
+
+
+@task(default=True)  # spostare nell'azione di default per compilazione report
+def compile_report_qmd(c):
+    """
+    Clean degli output e compila src/report.qmd
+    """
+    if outputs_dir.exists():
+        shutil.rmtree(outputs_dir)
+        outputs_dir.mkdir()
+    compile_qmd(Path("src/report.qmd"))
+
+
+@task()
+def compile_report_rnw(c):
+    """
+    Clean degli output e compila src/report.Rnw
+    """
+    if outputs_dir.exists():
+        shutil.rmtree(outputs_dir)
+        outputs_dir.mkdir()
+    compile_rnw(Path("src/report.Rnw"))
+
+
+@task
+def edit(c):
+    """
+    Edita i file rilevanti del progetto con Emacs.
+    """
+    paths_str = str(src_dir / "*")
+    cmd = f"{editor} {paths_str} & "
+    os.system(cmd)
+
+
+@task
+def help(c):
+    """
+    Help di Invoke.
+    """
+    c.run("invoke -h")
 
 
 @task
@@ -310,7 +425,8 @@ def init(c):
     # -----------------------------------------------------------
     print("Git init")
     url = metadata["project"]["url"]
-    cmd = f"git init -b master && git remote add origin {url} && git add . && git commit -m 'Directory setup'"
+    cmd = f"git init -b master && git remote add origin {url} " \
+        " && git add . && git commit -m 'Directory setup'"
     os.system(cmd)
     # -----------------------------------------------------------
     print("Logseq page")
@@ -324,221 +440,11 @@ def init(c):
 
 
 @task
-def adddataold(c):
+def list(c):
     """
-    Importa il dataset nella directory del progetto.
+    Lista i task di Invoke.
     """
-    import_data()
-
-
-@task
-def addredcapexport(c):
-    """
-    Importa il dataset nella directory del progetto.
-    """
-    import_redcap()
-
-
-@task
-def addprot(c):
-    """
-    Importa il protocollo nella directory del progetto.
-    """
-    import_protocol()
-
-
-@task
-def viewdata(c):
-    """
-    Mostra il dataset ultima versione.
-    """
-    possible_datasets = ["data/raw_dataset.xlsx", "data/LABELS.csv"]
-    available = [d for d in possible_datasets if os.path.exists(d)]
-    if len(available):
-        cmd = f"libreoffice --calc --view {' '.join(available)} &"
-        os.system(cmd)
-    else:
-        print("No datasets imported yet.")
-
-
-@task
-def viewprot(c):
-    """
-    Mostra il protocollo ultima versione.
-    """
-    cmd = f"{pdf_viewer} proj/docs/protocol.pdf &"
-    os.system(cmd)
-
-
-@task
-def viewlit(c):
-    """
-    Mostra la letteratura del progetto.
-    """
-    cmd = f"{pdf_viewer} proj/docs/letteratura/*.pdf &"
-    os.system(cmd)
-
-
-@task
-def viewcrf(c):
-    """
-    Mostra le crf del progetto.
-    """
-    cmd = f"{pdf_viewer} proj/docs/crf/*.pdf &"
-    os.system(cmd)
-
-
-@task
-def edit(c):
-    """
-    Edita i file rilevanti del progetto con Emacs.
-    """
-    paths_str  = str(src_dir / "*")
-    cmd = f"{editor}  {paths_str} & " 
-    os.system(cmd)
-
-
-@task
-def venvrepl(c):
-    """
-    Esegue un interprete python nell'environment considerato
-    """
-    os.system("uv run python")
-
-
-@task
-def venvsync(c):
-    """
-    Sincronizza uv per far si che tutte le dipendenze siano soddisfatte
-    """
-    os.system("uv sync")
-
-
-@task
-def venvfreeze(c):
-    """
-    Freeza le dipendenze ad oggi aggiungendo eclude-newer al pyproject.toml.
-    Prima di farlo fare l'update di tutti i pacchetti ed eseguire l'elaborazione
-    per sicurezza
-    """
-    # today = date.today().isoformat()
-    now = dt.datetime.now(dt.timezone.utc)
-    string = f"\n\n[tool.uv]\nexclude-newer = '{now.isoformat()}'\n"
-    with open("pyproject.toml", "a") as f:
-        f.write(string)
-
-
-@task
-def runpys(c):
-    """
-    Esegue i file src/*.py nella directory radice del progetto.
-    """
-    # pys = srcpys(prj)
-    pys = src_dir.glob("*.py")
-    for py in sorted(pys):
-        print(f"-- Executing {py} --")
-        c.run(f"uv run python {py}")
-
-
-@task
-def runrs(c):
-    """
-    Esegue i file src/*.R nella directory radice del progetto e ne salva l'output in
-    tmp
-    """
-    rs = src_dir.glob("*.R")
-    for r in sorted(rs):
-        infile = r
-        outfile = tmp_dir / (str(r.stem) + ".txt")
-        print(f"Executing {infile} (output in {outfile})")
-        cmd = f"R CMD BATCH --no-save --no-restore {infile} {outfile}"
-        c.run(cmd)
-
-
-@task(default=True)  # spostare nell'azione di default per compilazione report
-def reportqmd(c):
-    """
-    Clean degli output e compila src/report.qmd
-    """
-    if outputs_dir.exists():
-        shutil.rmtree(outputs_dir)
-        outputs_dir.mkdir()
-    compile_qmd(Path("src/report.qmd"))
-
-
-@task()
-def reportrnw(c):
-    """
-    Clean degli output e compila src/report.Rnw
-    """
-    if outputs_dir.exists():
-        shutil.rmtree(outputs_dir)
-        outputs_dir.mkdir()
-    compile_rnw(Path("src/report.Rnw"))
-
-
-@task
-def compiletexs(c):
-    """
-    Compila i file src/*.qmd nella directory radice del progetto con quarto.
-    """
-    texs = src_dir.glob("*.tex")
-    for tex in sorted(texs):
-        compile_tex(tex)
-
-
-@task
-def compilernws(c):
-    """
-    Compila i file src/*.Rnw nella directory radice del progetto con quarto.
-    """
-    rnws = src_dir.glob("*.Rnw")
-    for rnw in sorted(rnws):
-        compile_rnw(rnw)
-
-
-@task
-def compileqmds(c):
-    """
-    Compila i file src/*.qmd nella directory radice del progetto con quarto.
-    """
-    qmds = src_dir.glob("*.qmd")
-    for qmd in sorted(qmds):
-        compile_qmd(qmd)
-
-
-@task
-def tgrep(c):
-    """
-    Invia il report.pdf via telegram nella chat lavoro.
-    """
-    if not final_report.exists():
-        raise ValueError(f"Non esiste {final_report}.")
-    c.run(f"winston_sends {final_report} group::lavoro")
-
-
-@task
-def zip(c):
-    """
-    Zippa il report.pdf e i file in prj/outputs per l'invio.
-    """
-    metadata = get_metadata()
-    acronym = metadata["project"]["acronym"]
-    pi = metadata["pi"]["surname"]
-    paste = f"{pi}_{acronym}"
-    zip_fpath = Path(f"/tmp/{paste}.zip")
-    if zip_fpath.exists():
-        zip_fpath.unlink()
-    # copy reports in outputs
-    report_pdf = Path("report.pdf")
-    report_docx = Path("report.docx")
-    if report_pdf.exists():
-        shutil.copy(report_pdf, outputs_dir)
-    if report_docx.exists():
-        shutil.copy(report_docx, outputs_dir)
-    shutil.make_archive(str(zip_fpath.with_suffix("")),
-                        format = "zip",
-                        base_dir = outputs_dir)
+    c.run("invoke -l")
 
 
 @task
@@ -558,41 +464,138 @@ def ruff(c):
 
 
 @task
-def list(c):
+def run_all_pys(c):
     """
-    Lista i task di Invoke.
+    Esegue i file src/*.py nella directory radice del progetto.
     """
-    c.run("invoke -l")
+    # pys = srcpys(prj)
+    pys = src_dir.glob("*.py")
+    for py in sorted(pys):
+        print(f"-- Executing {py} --")
+        c.run(f"uv run python {py}")
 
 
 @task
-def help(c):
+def run_all_rs(c):
+    """Esegue i file src/*.R nella directory radice del progetto e ne salva
+    l'output in tmp
     """
-    Help di Invoke.
-    """
-    c.run("invoke -h")
+    rs = src_dir.glob("*.R")
+    for r in sorted(rs):
+        infile = r
+        outfile = tmp_dir / (str(r.stem) + ".txt")
+        print(f"Executing {infile} (output in {outfile})")
+        cmd = f"R CMD BATCH --no-save --no-restore {infile} {outfile}"
+        c.run(cmd)
 
 
 @task
-def updatetasks(c):
+def tg_report_pdf(c):
+    """
+    Invia il report.pdf via telegram nella chat lavoro.
+    """
+    if not final_report.exists():
+        raise ValueError(f"Non esiste {final_report}.")
+    c.run(f"winston_sends {final_report} group::lavoro")
+
+
+@task
+def update_tasks(c):
     """Update tasks.py to latest version"""
-    url = "https://raw.githubusercontent.com/lbraglia/cookiecutter-analysis/refs/heads/main/%7B%7B%20cookiecutter.project_dir%20%7D%7D/tasks.py"
-    addsomething(url = url, outfile = Path("tasks.py"), overwrite = True)
+    url = "https://raw.githubusercontent.com/lbraglia/cookiecutter-analysis" \
+        "/refs/heads/main/%7B%7B%20cookiecutter.project_dir%20%7D%7D/tasks.py"
+    addsomething(url=url, outfile=Path("tasks.py"), overwrite=True)
 
 
 @task
-def addplugins(c):
+def venv_freeze(c):
+    """Freeza le dipendenze ad oggi aggiungendo eclude-newer al
+    pyproject.toml.  Prima di farlo fare l'update di tutti i pacchetti ed
+    eseguire l'elaborazione per sicurezza
     """
-    Add plugins to current project
+    # today = date.today().isoformat()
+    now = dt.datetime.now(dt.timezone.utc)
+    string = f"\n\n[tool.uv]\nexclude-newer = '{now.isoformat()}'\n"
+    with open("pyproject.toml", "a") as f:
+        f.write(string)
+
+
+@task
+def venv_repl(c):
     """
-    baseurl = "https://raw.githubusercontent.com/lbraglia/cookiecutter-analysis/refs/heads/main/plugins/"
-    plugins = ["randomization.py",
-               "estimates_validation.R",
-               "report.Rnw",
-               "report.tex"]
-    choices = lb.utils.menu(title = "Specificare che plugin", choices = plugins)
-    if choices:
-        for f in choices:
-            url = baseurl + f
-            dest = src_dir / f
-            addsomething(url = url, outfile = dest, overwrite = False)
+    Esegue un interprete python nell'environment considerato
+    """
+    os.system("uv run python")
+
+
+@task
+def venv_sync(c):
+    """
+    Sincronizza uv per far si che tutte le dipendenze siano soddisfatte
+    """
+    os.system("uv sync")
+
+
+@task
+def view_crf(c):
+    """
+    Mostra le crf del progetto.
+    """
+    cmd = f"{pdf_viewer} proj/docs/crf/*.pdf &"
+    os.system(cmd)
+
+
+@task
+def view_data(c):
+    """
+    Mostra il dataset ultima versione.
+    """
+    possible_datasets = ["data/raw_dataset.xlsx", "data/LABELS.csv"]
+    available = [d for d in possible_datasets if os.path.exists(d)]
+    if len(available):
+        cmd = f"libreoffice --calc --view {' '.join(available)} &"
+        os.system(cmd)
+    else:
+        print("No datasets imported yet.")
+
+
+@task
+def view_literature(c):
+    """
+    Mostra la letteratura del progetto.
+    """
+    cmd = f"{pdf_viewer} proj/docs/letteratura/*.pdf &"
+    os.system(cmd)
+
+
+@task
+def view_protocol(c):
+    """
+    Mostra il protocollo ultima versione.
+    """
+    cmd = f"{pdf_viewer} proj/docs/protocol.pdf &"
+    os.system(cmd)
+
+
+@task
+def zip_results(c):
+    """
+    Zippa il report.pdf e i file in prj/outputs per l'invio.
+    """
+    metadata = get_metadata()
+    acronym = metadata["project"]["acronym"]
+    pi = metadata["pi"]["surname"]
+    paste = f"{pi}_{acronym}"
+    zip_fpath = Path(f"/tmp/{paste}.zip")
+    if zip_fpath.exists():
+        zip_fpath.unlink()
+    # copy reports in outputs
+    report_pdf = Path("report.pdf")
+    report_docx = Path("report.docx")
+    if report_pdf.exists():
+        shutil.copy(report_pdf, outputs_dir)
+    if report_docx.exists():
+        shutil.copy(report_docx, outputs_dir)
+    shutil.make_archive(str(zip_fpath.with_suffix("")),
+                        format="zip",
+                        base_dir=outputs_dir)
