@@ -230,8 +230,6 @@ def compile_tex(tex):
     pythontex = f"uv run pythontex {link.stem}"
     biber = f"biber {link.stem}"
     cmd = f"{pdflatex} && {biber} && {pythontex} && {pdflatex} && {pdflatex}"
-    # pdf_view = f"{pdf_viewer} {link.stem}.pdf"
-    # cmd = f"{pdflatex} && {biber} && {pythontex} && {pdflatex} && {pdflatex} && {pdf_view} &"
     os.system(cmd)
 
 
@@ -246,8 +244,6 @@ def compile_rnw(rnw):
     knit = f"Rscript -e 'knitr::knit(input = \"{link}\", output = \"{tex}\", envir = new.env())'"
     pdflatex = f"pdflatex {link.stem}"
     biber = f"biber {link.stem}"
-    # pdf_view = f"{pdf_viewer} {link.stem}.pdf"
-    # cmd = f"{knit} && {pdflatex} && {biber} && {pdflatex} && {pdflatex} && {pdf_view} &"
     cmd = f"{knit} && {pdflatex} && {biber} && {pdflatex} && {pdflatex}"
     os.system(cmd)
 
@@ -355,7 +351,7 @@ def compile_all_texs(c):
         compile_tex(tex)
 
 
-@task(default=True)  # spostare nell'azione di default per compilazione report
+@task()  # spostare nell'azione di default per compilazione report
 def compile_report_qmd(c):
     """
     Clean degli output e compila src/report.qmd
@@ -366,7 +362,7 @@ def compile_report_qmd(c):
     compile_qmd(Path("src/report.qmd"))
 
 
-@task()
+@task(default=True)
 def compile_report_rnw(c):
     """
     Clean degli output e compila src/report.Rnw
@@ -578,24 +574,32 @@ def view_protocol(c):
 
 
 @task
-def zip_results(c):
+def zip(c):
     """
-    Zippa il report.pdf e i file in prj/outputs per l'invio.
+    Zippa il report.pdf/docx e file in prj/outputs per l'invio.
     """
     metadata = get_metadata()
     acronym = metadata["project"]["acronym"]
     pi = metadata["pi"]["surname"]
     paste = f"{pi}_{acronym}"
-    zip_fpath = Path(f"/tmp/{paste}.zip")
+    # path to various things
+    out_fpath = Path(f"/tmp/{paste}")  # the zip directory to be zipped
+    figtab_fpath = out_fpath / "figure_tabelle"  # attachments
+    zip_fpath = Path(f"/tmp/{paste}.zip")  # the actual zip
+    # rm old stuff
     if zip_fpath.exists():
         zip_fpath.unlink()
-    # copy reports in outputs
+    if out_fpath.exists():
+        shutil.rmtree(out_fpath)
+    # copy outputs in out_fpath
+    shutil.copytree(outputs_dir, figtab_fpath)
+    # add reports in out_fpat
     report_pdf = Path("report.pdf")
     report_docx = Path("report.docx")
     if report_pdf.exists():
-        shutil.copy(report_pdf, outputs_dir)
+        shutil.copy(report_pdf, out_fpath)
     if report_docx.exists():
-        shutil.copy(report_docx, outputs_dir)
+        shutil.copy(report_docx, out_fpath)
     shutil.make_archive(str(zip_fpath.with_suffix("")),
                         format="zip",
-                        base_dir=outputs_dir)
+                        root_dir=out_fpath)
