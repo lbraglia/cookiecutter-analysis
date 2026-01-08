@@ -23,52 +23,35 @@
 \tableofcontents
 <<setup, include = FALSE>>=
 
-library(knitr)   # necessario per setup knitr
-library(lbmisc)  # necessario per lbmisc::knitr_inline
-knit_engines$set(python = reticulate::eng_python)
-opts_chunk$set(fig.path    = 'outputs/',
-               fig.align   = 'center',
-               size        = 'small',
-               strip.white = TRUE,
-               tidy        = FALSE,
-               echo        = FALSE,
-               error       = TRUE,
-               warning     = TRUE,
-               message     = TRUE,
-               dpi         = 600,
-               dev         = c('png', 'tiff', 'cairo_ps', 'pdf')[c(1, 3, 4)],
-               fig.width   = inches(cm = 8.5),  # dimensioni default journal
-               fig.height  = inches(cm = 8.5),  # dimensioni default journal
-               # compressione lossless dei tiff
-               dev.args    = list(tiff = list(compression = 'lzw')))
-knit_hooks$set(inline = lbmisc::knitr_inline)
-rm(list = ls(all = TRUE))
-source("tmp/clean_df.R")
-## df <- as.data.frame(feather::read_feather("tmp/clean_df.feather"))
-wb <- openxlsx::createWorkbook() ## raw tables
+rm(list = ls())
+source("src/include.R")
 
 @ 
+% ==============================================================================
 
 \section{Methods}
 
-
-Statistical analysis was conducted using R \cite{rcoreteam2025languageenvironmentstatistical}.
+Statistical analysis was conducted using R
+\cite{rcoreteam2026languageenvironmentstatistical}.
 
 \section{Results}
 
+\subsection{Descriptives}
+
+\subsection{Primary analysis}
+
+\subsection{Secondary analyses}
 
 
 
 
 
-% ================================================================================ %
 
-\printbibliography 
 
-<<>>=
 
-wb_to_xl(wb = wb, file = 'outputs/tabelle.xlsx')
-
-@ 
-
+% ==============================================================================
+<<export>>=
+if (length(wb$worksheets)) wb_to_xl(wb = wb, file = 'outputs/tabelle.xlsx')
+@
+\printbibliography
 \end{document}
