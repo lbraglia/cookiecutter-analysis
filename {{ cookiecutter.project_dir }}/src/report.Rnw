@@ -38,6 +38,23 @@ Statistical analysis was conducted using R
 
 \subsection{Descriptives}
 
+<<descriptives>>=
+
+# per stratificate inserire nome variabile e decommentare
+var_colonna <- NULL
+lbstat::tableone(
+  data = df_des[names(df_des) %without% var_colonna],
+  ## strata = var_colonna,
+  wb = wb,
+  test = FALSE,
+  showAllLevels = TRUE,
+  label = "descriptives",
+  caption = "Descriptives",
+  sheet = "descriptives")
+
+@
+
+
 \subsection{Primary analysis}
 
 \subsection{Secondary analyses}
@@ -51,7 +68,7 @@ Statistical analysis was conducted using R
 
 % ==============================================================================
 <<export>>=
-if (length(wb$worksheets)) wb_to_xl(wb = wb, file = 'outputs/tabelle.xlsx')
+if (length(wb$worksheets)) wb_to_xl(wb = wb, file = "outputs/tabelle.xlsx")
 @
 \printbibliography
 \end{document}
