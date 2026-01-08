@@ -37,8 +37,9 @@ Statistical analysis was conducted using R
 \section{Results}
 
 \subsection{Descriptives}
+Descrittive in tabella \ref{tab:descriptives}
 
-<<descriptives>>=
+<<descriptives, results="asis">>=
 
 # per stratificate inserire nome variabile e decommentare
 var_colonna <- NULL
