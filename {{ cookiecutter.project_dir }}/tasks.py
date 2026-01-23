@@ -421,8 +421,12 @@ def init(c):
     # -----------------------------------------------------------
     print("Git init")
     url = metadata["project"]["url"]
-    cmd = f"git init -b master && git remote add origin {url} " \
-        " && git add . && git commit -m 'Directory setup'"
+    # cmd = f"git init -b master && git remote add origin {url} " \
+    #     " && git add . && git commit -m 'Directory setup'"
+    cmd = f"git init -b master && " \
+        f"git remote add origin {url} && " \
+        "git add . && git commit -m 'Directory setup' && " \
+        "git push -u origin master"
     os.system(cmd)
     # -----------------------------------------------------------
     print("Logseq page")
