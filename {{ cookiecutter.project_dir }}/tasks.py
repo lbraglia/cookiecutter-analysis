@@ -57,7 +57,7 @@ def get_metadata():
 
 
 def addsomething(url, outfile, overwrite=False):
-    """Function to downloa stuff (plugin or udpdated tasks.py)"""
+    """Function to download stuff (plugin or udpdated tasks.py)"""
     if outfile.exists() and not overwrite:
         msg = f"File {outfile} already exists, download aborted."
         print(msg)
@@ -65,16 +65,15 @@ def addsomething(url, outfile, overwrite=False):
     os.system(f"wget -O {outfile} {url}")
 
 
-def import_data():
+def import_data(do_encryption=True):
     """
     Import latest dataset and set up proper symlinks.
     """
     msg = "Insert date of the data extraction " \
         "(YYYY-MM-DD) or leave blank to skip: "
     dataset_date = input(msg).replace("-", "_")
+    gpg_ext = '.gpg' if do_encryption else ''
     if dataset_date != "":
-        outfile = data_dir / f"raw_dataset_{dataset_date}.xlsx"
-        symlink = data_dir / "raw_dataset.xlsx"
         title = "Select DATA FILES to be imported and anonymized"
         initialdir = "/tmp"
         filetypes = [("Formati", ".csv .xls .xlsx .zip")]
@@ -85,34 +84,45 @@ def import_data():
         # import data
         dfs = lb.io.import_data(fpaths)
         # save as a single excel file
+        outfile = data_dir / f"raw_dataset_{dataset_date}.xlsx{gpg_ext}"
         lb.io.export_data(x=dfs, path=outfile.absolute(), index=False)
         # add symlink
+        symlink = data_dir / f"raw_dataset.xlsx{gpg_ext}"
         if symlink.exists():
             symlink.rename(data_dir / "old_raw_dataset.xlsx")
         symlink.symlink_to(outfile.relative_to(data_dir))
 
 
-def _setup_redcap_file(input_path, is_label):
-    """Copia e crea i link per i file esportati da redcap (sia dati che labels)"""
-    outfile = data_dir / input_path.name
+def _setup_redcap_file(input_path, is_label, do_encryption):
+    """
+    Copia e crea i link per i file esportati da redcap (sia dati che labels)
+    """
+    gpg_ext = '.gpg' if do_encryption else ''
+    outfile = data_dir / f"{input_path.name}{gpg_ext}"
     if is_label:
-        symlink = data_dir / "LABELS.csv"
-        old_symlink = data_dir / "OLD_LABELS.csv"
+        symlink = data_dir / f"LABELS.csv{gpg_ext}"
+        old_symlink = data_dir / f"OLD_LABELS.csv{gpg_ext}"
     else:
-        symlink = data_dir / "DATA.csv"
-        old_symlink = data_dir / "OLD_DATA.csv"
+        symlink = data_dir / f"DATA.csv{gpg_ext}"
+        old_symlink = data_dir / f"OLD_DATA.csv{gpg_ext}"
     # rm old symlink
     if symlink.exists():
         symlink.rename(old_symlink)
     # cp data
-    shutil.copy(input_path, outfile)
+    if do_encryption:
+        cmd = "gpg --encrypt --recipient lbraglia@gmail.com" \
+            f" --output {outfile} {input_path}"
+        os.system(cmd)
+    else:
+        shutil.copy(input_path, outfile)
     # add symlink
     symlink.symlink_to(outfile.relative_to(data_dir))
 
 
-def import_redcap():
+def import_redcap(do_encryption=True):
     """
-    Import latest redcap export (both DATA and LABELS) and set up proper symlinks.
+    Import latest redcap export (both DATA and LABELS) and set up proper
+    symlinks.
     """
     # tk-dialogbox
     title = "Select the two csvs for DATA and LABELS exported from RedCAP" \
@@ -131,7 +141,9 @@ def import_redcap():
     fpaths = [Path(p) for p in fpaths]
     labels = ["_DATA_LABELS_" in p.stem for p in fpaths]
     for i in range(len(fpaths)):
-        _setup_redcap_file(input_path=fpaths[i], is_label=labels[i])
+        _setup_redcap_file(input_path=fpaths[i],
+                           is_label=labels[i],
+                           do_encryption=do_encryption)
 
 
 def import_protocol():
@@ -271,9 +283,9 @@ def compile_qmd(qmd):
 
 
 @task
-def add_data_old(c):
+def add_data_generic(c):
     """
-    Importa il dataset nella directory del progetto.
+    Importa un insieme di dataset nella directory del progetto.
     """
     import_data()
 
@@ -281,7 +293,7 @@ def add_data_old(c):
 @task
 def add_data_redcap(c):
     """
-    Importa il dataset nella directory del progetto.
+    Importa i due dataset di redcap nella directory del progetto.
     """
     import_redcap()
 

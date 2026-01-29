@@ -6,11 +6,11 @@ testing = lb.utils.is_interactive()
 
 # # Data import
 # # -----------
-# # standard old import
-# dfs = lb.io.import_data("data/raw_dataset.xlsx") # multiple custom dataset
+# # standard generic (old) import
+# dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
 
 # redcap export import (data/DATA.csv, data/LABELS.csv)
-df, vd = lb.io.import_redcap() # dataframe and variable description
+df, vd = lb.io.import_redcap()
 pprint.pp(vd)
 
 # # # Sanitize variable names, keeping as comment
