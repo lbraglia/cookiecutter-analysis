@@ -1,0 +1,37 @@
+\documentclass[10pt]{beamer} 
+% \setbeameroption{show notes on second screen=right} % per presentazione con pympress
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{mypkg}
+\usepackage{hyperref}
+\usepackage[style=authoryear]{biblatex}
+\addbibresource{slides/biblio.bib}
+\usetheme{Copenhagen}
+\setbeamercovered{transparent} 
+\title[Health economics analysis update]{INSPIRE WP4 - Health economics}
+\subtitle{Analysis update}
+\author{Luca Braglia}
+% \date{may 2026}
+\begin{document}
+\setbeamertemplate{navigation symbols}{}%remove navigation symbols
+\frame{\titlepage}
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set("engine" = "R", fig.align = "center", tidy = TRUE, echo = FALSE)
+@
+% ====================================================================
+
+
+% \begin{slide}{Data flow}
+%   Diagramma overall
+% \end{slide}
+
+
+\end{document}
+
+% \cite{guyatt2008usersguidesmedical}
+
+% \begin{center}
+%   \includegraphics[scale = 0.35]{slides/img/immagine}
+% \end{center}
