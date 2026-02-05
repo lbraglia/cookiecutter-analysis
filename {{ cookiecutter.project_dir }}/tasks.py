@@ -308,7 +308,8 @@ def add_plugins(c):
     plugins = ["randomization.py",
                "estimates_validation.R",
                "report.Rnw",
-               "report.tex"]
+               "report.tex",
+               "slides.Rnw"]
     choices = lb.utils.menu(title="Specificare che plugin", choices=plugins)
     if choices:
         for f in choices:
@@ -384,6 +385,17 @@ def compile_report_rnw(c):
         outputs_dir.mkdir()
     compile_rnw(Path("src/report.Rnw"))
 
+
+@task
+def compile_slides(c):
+    """
+    Compila src/slides.Rnw
+    """
+    # if outputs_dir.exists():
+    #     shutil.rmtree(outputs_dir)
+    #     outputs_dir.mkdir()
+    compile_rnw(Path("src/slides.Rnw"))
+    
 
 @task
 def edit(c):
@@ -586,6 +598,15 @@ def view_protocol(c):
     Mostra il protocollo ultima versione.
     """
     cmd = f"{pdf_viewer} proj/docs/protocol.pdf &"
+    os.system(cmd)
+
+
+@task
+def view_slides(c):
+    """
+    Mostra le slides
+    """
+    cmd = f"{pdf_viewer} slides.pdf &"
     os.system(cmd)
 
 
