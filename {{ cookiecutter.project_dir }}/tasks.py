@@ -277,6 +277,15 @@ def compile_qmd(qmd):
         output_link.unlink()
 
 
+def compile_md(md):
+    "Compile a single md file in src"
+    outfile = Path("/tmp") / Path(md).name
+    if outfile.exists():
+        outfile.unlink()
+    print(f"-- Compiling {md} --")
+    os.system(f"pandoc {md} -f gfm -t docx -o {outfile}"
+              f" && libreoffice {outfile}")
+
 # -----------------------------------------------------------------------------------------------
 # COMMON TASKS
 # -----------------------------------------------------------------------------------------------
@@ -395,6 +404,17 @@ def compile_slides(c):
     #     shutil.rmtree(outputs_dir)
     #     outputs_dir.mkdir()
     compile_rnw(Path("src/slides.Rnw"))
+
+
+@task
+def compile_article(c):
+    """
+    Compila src/article.md
+    """
+    # if outputs_dir.exists():
+    #     shutil.rmtree(outputs_dir)
+    #     outputs_dir.mkdir()
+    compile_md(Path("src/article.md"))
     
 
 @task
