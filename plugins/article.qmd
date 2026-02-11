@@ -1,0 +1,28 @@
+---
+title: "Article title"
+date: last-modified
+toc: false
+fig-align: center
+fig-width: 3.346
+fig-height: 3.346
+fig-format: png
+fig-dpi: 600
+format: docx
+bibliography:
+  - proj/biblio/common_biblio.bib
+  - proj/biblio/prj_biblio.bib
+output-dir: "outputs"
+execute:
+  echo: false
+  warning: false
+  error: false
+jupyter: python3
+---
+
+
+This article is written according to CHEERS 2022 guideline
+[@husereau2022consolidatedhealtheconomic]; numbers in square brackets
+(e.g. [10a]) are CHEERS item identifiers
+
+
+# References
