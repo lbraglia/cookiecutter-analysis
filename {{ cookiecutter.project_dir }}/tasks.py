@@ -314,11 +314,14 @@ def add_plugins(c):
     """
     baseurl = "https://raw.githubusercontent.com/lbraglia/" \
         "cookiecutter-analysis/refs/heads/main/plugins/"
-    plugins = ["randomization.py",
-               "estimates_validation.R",
-               "report.Rnw",
-               "report.tex",
-               "slides.Rnw"]
+    plugins = [
+        "article.qmd",
+        "estimates_validation.R",
+        "randomization.py",
+        "report.qmd",
+        "report.tex",
+        "slides.Rnw"
+    ]
     choices = lb.utils.menu(title="Specificare che plugin", choices=plugins)
     if choices:
         for f in choices:
@@ -496,7 +499,7 @@ def mypy(c):
     """
     Esegue mypy nella cartella src del progetto.
     """
-    c.run("mypy src")
+    c.run("uv run mypy src")
 
 
 @task
@@ -504,7 +507,7 @@ def ruff(c):
     """
     Esegue ruff nella cartella src del progetto.
     """
-    c.run("ruff check src")
+    c.run("uv run ruff check src")
 
 
 @task
@@ -534,9 +537,9 @@ def run_all_rs(c):
 
 
 @task
-def tg_report_pdf(c):
+def tg(c):
     """
-    Invia il report.pdf via telegram nella chat lavoro.
+    Invia report.pdf via telegram nella chat lavoro.
     """
     if not final_report.exists():
         raise ValueError(f"Non esiste {final_report}.")
