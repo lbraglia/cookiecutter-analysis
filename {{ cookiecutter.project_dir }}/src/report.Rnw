@@ -42,9 +42,9 @@ Descrittive in tabella \ref{tab:descriptives}
 <<descriptives, results="asis">>=
 
 # per stratificate inserire nome variabile e decommentare
-var_colonna <- NULL
+var_colonna <- "gruppo"
 lbstat::tableone(
-  data = df_des[names(df_des) %without% var_colonna],
+  data = df_des,
   ## strata = var_colonna,
   wb = wb,
   test = FALSE,

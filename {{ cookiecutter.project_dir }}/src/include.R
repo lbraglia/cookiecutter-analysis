@@ -20,6 +20,7 @@ knit_hooks$set(inline = lbmisc::knitr_inline)
 wb <- openxlsx::createWorkbook() ## raw tables
 
 ## # pacchetti aggiuntivi
+library(lbstat)
 ## library(lbagree)
 ## library(lbdiag)
 ## library(lbtrial)
