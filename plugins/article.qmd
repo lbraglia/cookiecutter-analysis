@@ -7,7 +7,9 @@ fig-width: 3.346
 fig-height: 3.346
 fig-format: png
 fig-dpi: 600
-format: docx
+format: 
+  docx:
+    toc: true
 bibliography:
   - proj/biblio/common_biblio.bib
   - proj/biblio/prj_biblio.bib
@@ -39,5 +41,16 @@ This article is written according to CHEERS 2022 guideline
 - codice inline python non funziona? `{python} risultato`.
 - Citazione: inline [@moher2010consort]
 - LaTeX full formula: $$ \sum_{i=1}^n x_i $$
+- landscape come
+
+::: {.landscape} 
+qui e` in landscape
+:::
+qui non piu`
+
+- per inserire vai a capo di pagina (lasciare linea prima e dopo)
+
+{{< pagebreak >}}
+
 -->
 
