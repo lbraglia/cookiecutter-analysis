@@ -49,3 +49,9 @@ df = pd.read_pickle("tmp/clean_df.pkl")
 
 ```
 
+<!-- 
+- codice inline in R funziona out of the box: `{r} 1 + 1`
+- codice inline python non funziona? `{python} risultato`.
+- Citazione: inline [@moher2010consort]
+- LaTeX full formula: $$ \sum_{i=1}^n x_i $$
+-->

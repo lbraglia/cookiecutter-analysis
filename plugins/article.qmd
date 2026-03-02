@@ -19,6 +19,13 @@ execute:
 jupyter: python3
 ---
 
+```{python}
+#| label: label1
+#| output: asis
+
+```
+
+
 
 This article is written according to CHEERS 2022 guideline
 [@husereau2022consolidatedhealtheconomic]; numbers in square brackets
@@ -26,3 +33,11 @@ This article is written according to CHEERS 2022 guideline
 
 
 # References
+
+<!-- 
+- codice inline in R funziona out of the box: `{r} 1 + 1`
+- codice inline python non funziona? `{python} risultato`.
+- Citazione: inline [@moher2010consort]
+- LaTeX full formula: $$ \sum_{i=1}^n x_i $$
+-->
+
