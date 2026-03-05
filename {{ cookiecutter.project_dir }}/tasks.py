@@ -170,7 +170,9 @@ def import_protocol():
             libreoffice_export = Path("/tmp") / (fpath.stem + '.pdf')
             if libreoffice_export.exists():
                 libreoffice_export.unlink()
-            os.system(f"libreoffice --headless --convert-to pdf {fpath} --outdir /tmp")
+            cmd = f"libreoffice --headless --convert-to pdf {fpath}" \
+                "--outdir /tmp"
+            os.system(cmd)
             shutil.copy(libreoffice_export, outfile.absolute())
         # smart symlinks
         if symlink.exists():
@@ -189,7 +191,8 @@ def create_logseq_page(fpath, metadata):
     prj_url = metadata["project"]["url"]
     prj_created = metadata["project"]["created"]
     prj_contatto = metadata["project"]["contatto"]
-    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    days = ["Monday", "Tuesday", "Wednesday",
+            "Thursday", "Friday", "Saturday", "Sunday"]
     dow = days[dt.date.fromisoformat(prj_created).weekday()]
     created = f"{prj_created} {dow}"
     logseq_template = f"""type:: [[project]]
@@ -220,71 +223,17 @@ project-ndatasets:: 1
 -
 """
     with open(fpath, "w") as f:
-        print(logseq_template, file = f)
+        print(logseq_template, file=f)
 
 
 def uv_init():
     os.system("rm -rf .venv uv.lock pyproject.toml")
     subprocess.run(["uv", "init", "."])
     subprocess.run(["rm", "-rf", "main.py"])
-    subprocess.run(["uv", "add", "--editable", "file:///home/l/.src/pypkg/pylbmisc"])
+    subprocess.run(["uv", "add", "--editable",
+                    "file:///home/l/.src/pypkg/pylbmisc"])
     subprocess.run(["uv", "add"] + default_prj_requirements)
 
-
-def compile_tex(tex):
-    """Compile a single tex file in src"""
-    link = Path(tex.name) # current directory
-    if link.exists():
-        link.unlink()
-    link.symlink_to(tex)
-    print(f"-- Compiling {tex} --")
-    pdflatex = f"pdflatex {link.stem}"
-    pythontex = f"uv run pythontex {link.stem}"
-    biber = f"biber {link.stem}"
-    cmd = f"{pdflatex} && {biber} && {pythontex} && {pdflatex} && {pdflatex}"
-    os.system(cmd)
-
-
-def compile_rnw(rnw):
-    """Compile a single Rnw file in src"""
-    link = Path(rnw.name) # current directory
-    tex = link.with_suffix(".tex")
-    if link.exists():
-        link.unlink()
-    link.symlink_to(rnw)
-    print(f"-- Compiling {rnw} --")
-    knit = f"Rscript -e 'knitr::knit(input = \"{link}\", output = \"{tex}\", envir = new.env())'"
-    pdflatex = f"pdflatex {link.stem}"
-    biber = f"biber {link.stem}"
-    cmd = f"{knit} && {pdflatex} && {biber} && {pdflatex} && {pdflatex}"
-    os.system(cmd)
-
-
-def compile_qmd(qmd):
-    """Compile a single qmd file in src"""
-    link = Path(qmd.name)  # link of eg report.qmd to src/report.qmd
-    if link.exists():
-        link.unlink()
-    link.symlink_to(qmd)
-    # redirect quarto figures to output
-    output_link = Path(link.stem + "_files")
-    if output_link.exists():
-        output_link.unlink()
-    output_link.symlink_to("outputs")
-    print(f"-- Compiling {qmd} --")
-    os.system(f"uv run quarto render {link} --debug")
-    if output_link.exists():
-        output_link.unlink()
-
-
-def compile_md(md):
-    "Compile a single md file in src"
-    outfile = Path("/tmp") / Path(md).name
-    if outfile.exists():
-        outfile.unlink()
-    print(f"-- Compiling {md} --")
-    os.system(f"pandoc {md} -f gfm -t docx -o {outfile}"
-              f" && libreoffice {outfile}")
 
 # -----------------------------------------------------------------------------------------------
 # COMMON TASKS
@@ -319,7 +268,7 @@ def add_plugins(c):
         "estimates_validation.R",
         "randomization.py",
         "report.qmd",
-        "report.tex",
+        # "report.tex",
         "slides.Rnw"
     ]
     choices = lb.utils.menu(title="Specificare che plugin", choices=plugins)
@@ -346,79 +295,143 @@ def clean(c):
     c.run(clean_cmd)
 
 
-@task
-def compile_all_qmds(c):
-    """
-    Compila i file src/*.qmd nella directory radice del progetto con quarto.
-    """
-    qmds = src_dir.glob("*.qmd")
-    for qmd in sorted(qmds):
-        compile_qmd(qmd)
+def _run_r(f):
+    infile = f
+    outfile = tmp_dir / (str(f.stem) + ".txt")
+    print(f"Executing {infile} (output in {outfile})")
+    cmd = f"R CMD BATCH --no-save --no-restore {infile} {outfile}"
+    os.system(cmd)
 
 
 @task
-def compile_all_rnws(c):
+def run_r(c, f="src/estimates_validation.R"):
+    """Esegue un file .R, di default src/estimates_validation.R"""
+    _run_r(f)
+
+
+@task
+def run_all_r(c):
+    """Esegue i file src/*.R nella directory radice del progetto e ne salva
+    l'output in tmp
+    """
+    rs = src_dir.glob("*.R")
+    for r in sorted(rs):
+        _run_r(r)
+
+
+def _run_py(f):
+    print(f"-- Executing {f} --")
+    os.system(f"uv run python {f}")
+
+
+@task
+def run_py(c, f="src/data_cleaning.py"):
+    """Esegue un file .py, di default src/data_cleaning.py"""
+    _run_py(f)
+
+
+@task
+def run_all_py(c):
+    """
+    Esegue i file src/*.py nella directory radice del progetto.
+    """
+    # pys = srcpys(prj)
+    pys = src_dir.glob("*.py")
+    for py in sorted(pys):
+        _run_py(py)
+
+
+def _compile_rnw(rnw):
+    """Compile a single Rnw file in src"""
+    link = Path(rnw.name)  # current directory
+    tex = link.with_suffix(".tex")
+    if link.exists():
+        link.unlink()
+    link.symlink_to(rnw)
+    print(f"-- Compiling {rnw} --")
+    knit = f"Rscript -e 'knitr::knit(input = \"{link}\", output = \"{tex}\", envir = new.env())'"
+    pdflatex = f"pdflatex {link.stem}"
+    biber = f"biber {link.stem}"
+    cmd = f"{knit} && {pdflatex} && {biber} && {pdflatex} && {pdflatex}"
+    os.system(cmd)
+
+
+@task
+def compile_rnw(c, f="src/report.Rnw", clean=True):
+    """Compile a single rnw file (default src/report.Rnw) using knitr"""
+    if clean:
+        if outputs_dir.exists():
+            shutil.rmtree(outputs_dir)
+            outputs_dir.mkdir()
+    _compile_rnw(Path(f))
+
+
+@task
+def compile_all_rnw(c, clean=True):
     """
     Compila i file src/*.Rnw nella directory radice del progetto con quarto.
     """
     rnws = src_dir.glob("*.Rnw")
+    if clean:
+        if outputs_dir.exists():
+            shutil.rmtree(outputs_dir)
+            outputs_dir.mkdir()
     for rnw in sorted(rnws):
-        compile_rnw(rnw)
+        _compile_rnw(rnw)
+
+
+def _compile_qmd(qmd):
+    """Compile a single qmd file in src"""
+    link = Path(qmd.name)  # link of eg report.qmd to src/report.qmd
+    if link.exists():
+        link.unlink()
+    link.symlink_to(qmd)
+    # redirect quarto figures to output
+    output_link = Path(link.stem + "_files")
+    if output_link.exists():
+        output_link.unlink()
+    output_link.symlink_to("outputs")
+    print(f"-- Compiling {qmd} --")
+    os.system(f"uv run quarto render {link} --debug")
+    if output_link.exists():
+        output_link.unlink()
 
 
 @task
-def compile_all_texs(c):
+def compile_qmd(c, f="src/report.qmd", clean=True):
+    """Compile a single qmd file (defalt src/report.qmd) using quarto"""
+    if clean:
+        if outputs_dir.exists():
+            shutil.rmtree(outputs_dir)
+            outputs_dir.mkdir()
+    _compile_qmd(Path(f))
+
+
+@task
+def compile_all_qmd(c, clean=True):
     """
     Compila i file src/*.qmd nella directory radice del progetto con quarto.
     """
-    texs = src_dir.glob("*.tex")
-    for tex in sorted(texs):
-        compile_tex(tex)
-
-
-@task()  # spostare nell'azione di default per compilazione report
-def compile_report_qmd(c):
-    """
-    Clean degli output e compila src/report.qmd
-    """
-    if outputs_dir.exists():
-        shutil.rmtree(outputs_dir)
-        outputs_dir.mkdir()
-    compile_qmd(Path("src/report.qmd"))
-
-
-@task(default=True)
-def compile_report_rnw(c):
-    """
-    Clean degli output e compila src/report.Rnw
-    """
-    if outputs_dir.exists():
-        shutil.rmtree(outputs_dir)
-        outputs_dir.mkdir()
-    compile_rnw(Path("src/report.Rnw"))
+    qmds = src_dir.glob("*.qmd")
+    if clean:
+        if outputs_dir.exists():
+            shutil.rmtree(outputs_dir)
+            outputs_dir.mkdir()
+    for qmd in sorted(qmds):
+        _compile_qmd(qmd)
 
 
 @task
-def compile_slides(c):
+def tg(c, f=final_report):
     """
-    Compila src/slides.Rnw
+    Invia un file (di default report.pdf) via telegram nella chat lavoro.
     """
-    # if outputs_dir.exists():
-    #     shutil.rmtree(outputs_dir)
-    #     outputs_dir.mkdir()
-    compile_rnw(Path("src/slides.Rnw"))
+    p = Path(f)
+    if p.is_file():
+        c.run(f"winston_sends {p} group::lavoro")
+    else:
+        raise ValueError(f"{p} non esiste.")
 
-
-@task
-def compile_article(c):
-    """
-    Compila src/article.md
-    """
-    # if outputs_dir.exists():
-    #     shutil.rmtree(outputs_dir)
-    #     outputs_dir.mkdir()
-    compile_md(Path("src/article.md"))
-    
 
 @task
 def edit(c):
@@ -508,42 +521,6 @@ def ruff(c):
     Esegue ruff nella cartella src del progetto.
     """
     c.run("uv run ruff check src")
-
-
-@task
-def run_all_pys(c):
-    """
-    Esegue i file src/*.py nella directory radice del progetto.
-    """
-    # pys = srcpys(prj)
-    pys = src_dir.glob("*.py")
-    for py in sorted(pys):
-        print(f"-- Executing {py} --")
-        c.run(f"uv run python {py}")
-
-
-@task
-def run_all_rs(c):
-    """Esegue i file src/*.R nella directory radice del progetto e ne salva
-    l'output in tmp
-    """
-    rs = src_dir.glob("*.R")
-    for r in sorted(rs):
-        infile = r
-        outfile = tmp_dir / (str(r.stem) + ".txt")
-        print(f"Executing {infile} (output in {outfile})")
-        cmd = f"R CMD BATCH --no-save --no-restore {infile} {outfile}"
-        c.run(cmd)
-
-
-@task
-def tg(c):
-    """
-    Invia report.pdf via telegram nella chat lavoro.
-    """
-    if not final_report.exists():
-        raise ValueError(f"Non esiste {final_report}.")
-    c.run(f"winston_sends {final_report} group::lavoro")
 
 
 @task
