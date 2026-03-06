@@ -18,7 +18,7 @@ from tkinter.filedialog import askopenfilename
 editor = "emacs --no-splash -r -fh"
 pdf_viewer = "evince"
 clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-*" \
-    " *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md"
+    " *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md *.nav *.snm"
 
 # libraries needed for any project (for quarto and to df.to_markdown)
 default_prj_requirements = ["jupyter", "tabulate"]
