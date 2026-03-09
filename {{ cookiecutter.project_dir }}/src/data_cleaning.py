@@ -1,8 +1,13 @@
 import pylbmisc as lb
 from pylbmisc.r import *
 import pprint
+# import src.common as prj # prj specific common code
 testing = lb.utils.is_interactive()
-# from functools import reduce
+if testing:
+    import importlib
+    # importlib.reload(prj)
+
+
 
 # # Data import
 # # -----------
@@ -117,7 +122,7 @@ df.select_dtypes("string[pyarrow]").columns.to_list()
 #                     suffixes=(None, None))
 
 
-# df = reduce(merger, [df, lav, sal, bis])
+# df = functools.reduce(merger, [df, lav, sal, bis])
 
 
 # # Variabili derivate
