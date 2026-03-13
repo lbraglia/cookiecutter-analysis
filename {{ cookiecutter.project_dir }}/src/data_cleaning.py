@@ -13,12 +13,20 @@ else:
 
 # # Data import
 # # -----------
-# # standard generic (old) import
-# dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
+# try used in order to avoid GPG import every run
 
-# redcap export import (data/DATA.csv, data/LABELS.csv)
-df, vd = lb.io.import_redcap()
-pprint.pp(vd)
+# # standard generic (old) import
+# try:
+#     dfs
+# except NameError:
+#     dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
+
+# # redcap export import (data/DATA.csv, data/LABELS.csv)
+# try:
+#     df
+# except NameError:
+#     df, vd = lb.io.import_redcap()
+# pprint.pp(vd)
 
 # # # Sanitize variable names, keeping as comment
 # # # -------------------------------------------
