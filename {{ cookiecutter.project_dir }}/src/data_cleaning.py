@@ -1,12 +1,14 @@
 import pylbmisc as lb
 from pylbmisc.r import *
 import pprint
-# import src.common as prj # prj specific common code
-testing = lb.utils.is_interactive()
-if testing:
+testing = interactive = lb.utils.is_interactive()
+# prj specific common code
+if interactive:
+    import src.common as prj  
     import importlib
     # importlib.reload(prj)
-
+else:
+    import common as prj    
 
 
 # # Data import
