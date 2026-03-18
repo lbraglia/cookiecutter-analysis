@@ -39,9 +39,6 @@ df = pd.read_pickle("tmp/clean_df.pkl")
 ```
 
 
-
-
-
 ```{python}
 #| label: export-tables
 
@@ -50,8 +47,10 @@ df = pd.read_pickle("tmp/clean_df.pkl")
 ```
 
 <!-- 
-- codice inline in R funziona out of the box: `{r} 1 + 1`
-- codice inline python non funziona? `{python} risultato`.
+- codice inline R funziona out of the box: `{r} 1 + 1`
+- codice inline python: analisi **`{python} "senza" if True else "con"`**
+  pazienti XYZ
+- come si vede sopra, il markdown fuori dal codice e` meglio
 - Citazione: inline [@moher2010consort]
 - LaTeX full formula: $$ \sum_{i=1}^n x_i $$
 - landscape come
@@ -61,8 +60,24 @@ qui e` in landscape
 :::
 qui non piu`
 
-- per inserire vai a capo di pagina (lasciare linea prima e dopo)
+- per andare a pagina nuova (lasciare linea prima e dopo)
 
 {{< pagebreak >}}
 
+
+- Per rimuovere sezioni
+
+```{python}
+#| output: asis
+lb.io.hide_if(True)
+```
+
+Questa frase non viene stampata.
+
+```{python}
+#| output: asis
+lb.io.hide_fi(True)
+```
+
 -->
+
