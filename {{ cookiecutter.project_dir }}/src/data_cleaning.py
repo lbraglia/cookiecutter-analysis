@@ -102,8 +102,8 @@ df_coercions = {
 dfs = dfs.set_index("sud_codpaz")
 df = lb.dm.Coercer(dfs, df_coercions).coerce()
 # # multiple datasets
-# df  = lb.dm.Coercer(dfs["df"], df_coercions).coerce()
-# df2 = lb.dm.Coercer(dfs["df2"], df2_coercions).coerce()
+# clean_df  = lb.dm.Coercer(dfs["df"], df_coercions).coerce()
+# clean_df2 = lb.dm.Coercer(dfs["df2"], df2_coercions).coerce()
 
 # stringhe rimanenti
 df.select_dtypes("string[pyarrow]").columns.to_list()
