@@ -1,13 +1,12 @@
 [project]
-name = "{{cookiecutter.pi_surname}}-{{cookiecutter.project_acronym}}"
+name = "{{cookiecutter.pi_surname.lower()}}_{{cookiecutter.project_acronym}}"
 version = "0.1.0"
-title = "{{cookiecutter.project_title}}"
 description = "{{cookiecutter.project_description}}"
 acronym = "{{cookiecutter.project_acronym}}"
 title = "{{cookiecutter.project_title}}"
 url = "https://lbraglia@gitlab.com/lbraglia/{{cookiecutter.project_repo}}.git"
 created = "{{cookiecutter.project_created}}"
-contatto = "{{cookiecutter.project_contatto}}"
+altri_contatti = "{{cookiecutter.project_altri_contatti}}"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [

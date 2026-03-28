@@ -8,5 +8,5 @@
     "project_dir": "{{cookiecutter.pi_surname.lower().replace(' ', '')}}_{{cookiecutter.project_acronym.lower().replace(' ', '')}}",
     "project_repo": "prj{% now 'utc', '%y' %}_{{cookiecutter.project_dir}}",
     "project_created": "{% now 'utc', '%Y-%m-%d' %}",
-    "project_contatto": "{{cookiecutter.pi_surname}}"
+    "project_altri_contatti": ""
 }

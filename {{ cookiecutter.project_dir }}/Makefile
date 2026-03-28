@@ -97,13 +97,13 @@ tg-slides:
 
 
 view-protocol:
-	${PDFVIEWER} proj/docs/protocol.pdf &
+	${PDFVIEWER} proj/protocol.pdf &
 
 view-crf:
-	${PDFVIEWER} proj/docs/crf/*.pdf &
+	${PDFVIEWER} proj/crf/*.pdf &
 
 view-literature:
-	${PDFVIEWER} proj/docs/letteratura/*.pdf &
+	${PDFVIEWER} proj/letteratura/*.pdf &
 
 view-article:
 	${DOCVIEWER} article.docx &

@@ -18,11 +18,11 @@ final_report  = root / "report.pdf"
 
 
 def get_metadata():
-    """Read/parse the project .ini file containing information inserted during
+    """Read/parse the project config file containing information inserted during
     project creation."""
-    ini_path = proj_dir / "info.ini"
+    metadata_file = "pyproject.toml"
     metadata = configparser.ConfigParser()
-    metadata.read(ini_path)
+    metadata.read(metadata_file)
     return metadata
 
 

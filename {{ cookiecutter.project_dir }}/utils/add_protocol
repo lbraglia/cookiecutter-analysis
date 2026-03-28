@@ -7,6 +7,8 @@ import datetime as dt
 from pathlib import Path
 from tkinter.filedialog import askopenfilename
 
+docs_dir = Path("proj/")
+
 def import_protocol():
     """
     Import latest protocol and set up proper symlinks
