@@ -1,0 +1,164 @@
+#!/usr/bin/env python
+import configparser
+import os
+import shutil
+import subprocess
+import datetime as dt
+
+# import pylbmisc as lb
+
+from pathlib import Path
+# from invoke import task
+# from tkinter.filedialog import askopenfilename
+
+# -----------------------------------------------------------------------------------------------
+# PARAMETERS
+# -----------------------------------------------------------------------------------------------
+
+# external programs
+editor = "emacs --no-splash -r -fh"
+pdf_viewer = "evince"
+clean_cmd = "rm -rf *.tex *.aux *.pytxcode *.toc *.log pythontex-files-*" \
+    " *.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md *.nav *.snm"
+
+# libraries needed for any project (for quarto and to df.to_markdown)
+default_prj_requirements = ["jupyter", "tabulate"]
+
+# -----------------------------------------------------------------------------------------------
+# PATHS
+# -----------------------------------------------------------------------------------------------
+
+# project
+root = Path(".")
+src_dir       = root / "src"
+tmp_dir       = root / "tmp"
+data_dir      = root / "data"
+outputs_dir   = root / "outputs"
+proj_dir      = root / "proj"
+common_biblio = root / "proj" / "biblio" / "common_biblio.bib"
+prj_biblio    = root / "proj" / "biblio" / "prj_biblio.bib"
+final_report  = root / "report.pdf"
+
+# outside project
+brain = Path("~/.brain/pages").expanduser()
+
+# -----------------------------------------------------------------------------------------------
+# UTILS
+# -----------------------------------------------------------------------------------------------
+
+
+def get_metadata():
+    """Read/parse the project .ini file containing information inserted during
+    project creation."""
+    ini_path = "pyproject.toml"
+    metadata = configparser.ConfigParser()
+    metadata.read(ini_path)
+    return metadata
+
+
+def create_logseq_page(fpath, metadata):
+    pi_surname = metadata["pi"]["surname"]
+    pi_name = metadata["pi"]["name"]
+    pi_uo = metadata["pi"]["uo"]
+    prj_description = metadata["project"]["description"]
+    prj_acronym = metadata["project"]["acronym"]
+    prj_title = metadata["project"]["title"]
+    # prj_dir = metadata["project"]["dir"]
+    prj_url = metadata["project"]["url"]
+    prj_created = metadata["project"]["created"]
+    prj_altri_contatti = metadata["project"]["altri_contatti"]
+    days = ["Monday", "Tuesday", "Wednesday",
+            "Thursday", "Friday", "Saturday", "Sunday"]
+    dow = days[dt.date.fromisoformat(prj_created).weekday()]
+    created = f"{prj_created} {dow}"
+    logseq_template = f"""type:: [[project]]
+area:: [[lavoro]]
+description:: {prj_description}
+tags:: fase1 | fase2 | fase3 | fase4, 1braccio | 2bracci | +2bracci, superiorità | non-inferiorità | equivalenza, coorte | caso-controllo | cross-sectional, eziologico | diagnostico | trattamento | prognostico, prospettico | retrospettivo
+noteworthy:: 
+created:: [[{created}]]
+project-title:: {prj_title}
+project-acronym:: {prj_acronym}
+project-pi:: {pi_surname} {pi_name} @
+pi-struttura:: {pi_uo} <>
+project-altri-contatti:: {prj_altri_contatti} @
+project-repo:: [here]({prj_url})
+project-ndatasets:: 1
+-
+- ## Lore
+	-
+-
+- ## Log
+	-
+-
+- ## Meetings
+	-
+-
+- ## Appunti
+	-
+-
+"""
+    with open(fpath, "w") as f:
+        print(logseq_template, file=f)
+
+
+# def uv_init():
+#     os.system("rm -rf .venv uv.lock pyproject.toml")
+#     subprocess.run(["uv", "init", "."])
+#     subprocess.run(["rm", "-rf", "main.py"])
+#     subprocess.run(["uv", "add", "--editable",
+#                     "file:///home/l/.src/pypkg/pylbmisc"])
+#     subprocess.run(["uv", "add"] + default_prj_requirements)
+
+
+def init():
+    """
+    Inizializza un nuovo progetto parzialmente creato da cookiecutter
+    """
+    metadata = get_metadata()
+    # ------------------------------------------------------------
+    print("Bibliography setup")
+    if not common_biblio.exists():
+        os.symlink("/home/l/texmf/tex/latex/biblio/biblio.bib",
+                   common_biblio.absolute())
+    subprocess.run(["touch", str(prj_biblio)])
+    # # -----------------------------------------------------------
+    # NON FATTI PIU QUI perché
+    # 1) quando inizializzo tipicamente non ho il dataset di analisi o il
+    #    protocollo (almeno prospetticamente)
+    # 2) per i dataset decido da linea di comando se importare dataset vari o
+    #    da redcap
+    #
+    # print("Importing protocol")
+    # import_protocol()
+    # -----------------------------------------------------------
+    # print("Importing dataset")
+    # import_data()
+    # -----------------------------------------------------------
+    # questo non si fa piu
+    # print("UV init")
+    # uv_init()
+    # -----------------------------------------------------------
+    print("Git init")
+    # -----------------------------------------------------------
+    url = metadata["project"]["url"]
+    # cmd = f"git init -b master && git remote add origin {url} " \
+    #     " && git add . && git commit -m 'Directory setup'"
+    cmd = f"git init -b master && " \
+        f"git remote add origin {url} && " \
+        "git add . && git commit -m 'Directory setup' && " \
+        "git push -u origin master"
+    os.system(cmd)
+    # -----------------------------------------------------------
+    print("Logseq page")
+    # -----------------------------------------------------------
+    logseq_page = brain / (metadata["project"]["dir"] + ".md")
+    if logseq_page.exists():
+        print("logseq page already available, skipping.")
+    else:
+        create_logseq_page(fpath=logseq_page, metadata=metadata)
+    return None
+
+
+if __name__=="__main__":
+    init()
