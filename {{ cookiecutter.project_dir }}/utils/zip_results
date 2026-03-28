@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import configparser
+# import configparser
+import tomllib
 import shutil
 # import pylbmisc as lb
 from pathlib import Path
@@ -16,14 +17,23 @@ common_biblio = root / "proj" / "biblio" / "common_biblio.bib"
 prj_biblio    = root / "proj" / "biblio" / "prj_biblio.bib"
 final_report  = root / "report.pdf"
 
-
 def get_metadata():
-    """Read/parse the project config file containing information inserted during
+    """Read/parse the project .ini file containing information inserted during
     project creation."""
-    metadata_file = "pyproject.toml"
-    metadata = configparser.ConfigParser()
-    metadata.read(metadata_file)
+    # metadata = configparser.ConfigParser()
+    # metadata.read(ini_path)
+    with open("pyproject.toml", "rb") as f:
+        metadata = tomllib.load(f)
     return metadata
+
+
+# def get_metadata():
+#     """Read/parse the project config file containing information inserted during
+#     project creation."""
+#     metadata_file = "pyproject.toml"
+#     metadata = configparser.ConfigParser()
+#     metadata.read(metadata_file)
+#     return metadata
 
 
 def zip():
