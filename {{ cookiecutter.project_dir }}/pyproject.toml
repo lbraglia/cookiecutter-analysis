@@ -1,0 +1,16 @@
+[project]
+name = "{{cookiecutter.pi_surname}} - {{cookiecutter.project_acronym}}"
+version = "0.1.0"
+description = "{{cookiecutter.project_title}}"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "jupyter",
+    "tabulate",
+    "pylbmisc",
+    "prjlib",
+]
+
+[tool.uv.sources]
+pylbmisc = { path = "../../.src/pypkg/pylbmisc", editable = true }
+prjlib = { path = "src/prjlib", editable = true }

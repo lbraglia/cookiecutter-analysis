@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+now=$(date --utc '+%Y-%m-%dT%H:%M:%S.000000+00:00')
+uvstring="\n\n[tool.uv]\nexclude-newer = '${now}'\n"
+printf "${uvstring}" >> pyproject.toml

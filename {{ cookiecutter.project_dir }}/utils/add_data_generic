@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+# import os
+# import shutil
+# import subprocess
+# import datetime as dt
+import pylbmisc as lb
+from pathlib import Path
+from tkinter.filedialog import askopenfilename
+
+# -----
+# PATHS
+# -----
+
+# project
+root = Path(".")
+data_dir      = root / "data"
+
+# ----
+# UTILS
+# ----
+
+
+def import_data(do_encryption=True):
+    """
+    Import latest dataset and set up proper symlinks.
+    """
+    msg = "Insert date of the data extraction " \
+        "(YYYY-MM-DD) or leave blank to skip: "
+    dataset_date = input(msg).replace("-", "_")
+    gpg_ext = '.gpg' if do_encryption else ''
+    if dataset_date != "":
+        title = "Select DATA FILES to be imported and anonymized"
+        initialdir = "/tmp"
+        filetypes = [("Formati", ".csv .xls .xlsx .zip")]
+        fpaths = askopenfilename(
+            title=title, initialdir=initialdir,
+            filetypes=filetypes, multiple=True
+        )
+        # import data
+        dfs = lb.io.import_data(fpaths, csv_kwargs={"dtype_backend":"pyarrow"})
+        # save as a single excel file
+        outfile = data_dir / f"raw_dataset_{dataset_date}.xlsx{gpg_ext}"
+        lb.io.export_data(x=dfs, path=outfile.absolute(), index=False)
+        # add symlink
+        symlink = data_dir / f"raw_dataset.xlsx{gpg_ext}"
+        if symlink.exists():
+            symlink.rename(data_dir / "old_raw_dataset.xlsx")
+        symlink.symlink_to(outfile.relative_to(data_dir))
+
+
+
+if __name__=="__main__":
+    import_data()

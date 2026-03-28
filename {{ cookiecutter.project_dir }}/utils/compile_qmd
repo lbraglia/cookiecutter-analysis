@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+bn=$(basename ${1})
+bn_no_ext=$(echo $bn | sed 's/\.qmd//')
+
+# rinfresca il link all'Rnw nella directory corrente
+[[ -e ${bn} ]] && rm ${bn} # && echo "vecchio link rimosso"
+ln -s ${1} ${bn}
+
+# redirect quarto figures to output dir (refresh dir link)
+outputs_link="${bn_no_ext}_files"
+[[ -e ${outputs_link} ]] && rm ${outputs_link}
+ln -s outputs ${outputs_link}
+
+# Nixos issues here
+# https://github.com/orgs/quarto-dev/discussions/11257
+# https://github.com/NixOS/nixpkgs/blob/910796cabe436259a29a72e8d3f5e180fc6dfacc/pkgs/development/libraries/quarto/default.nix#L67
+# https://github.com/orgs/quarto-dev/discussions/12506
+[[ -d /etc/nixos ]] && export QUARTO_PYTHON=.venv/bin/python
+quarto render ${bn} --debug # uv run e` nel makefile
+
+# # cleaning quarto tricks link
+# [[ -e ${output_link} ]] && rm ${output_link}

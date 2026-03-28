@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+bn=$(basename ${1})
+bn_no_ext=$(echo $bn | sed 's/\.Rnw//')
+tex="${bn_no_ext}.tex"
+
+# rinfresca il link all'Rnw nella directory corrente
+[[ -e ${bn} ]] && rm ${bn} # && echo "vecchio link rimosso"
+ln -s ${1} ${bn}
+
+knit_cmd="knitr::knit(input = '${bn}', output = '${tex}', envir = new.env())"
+
+Rscript -e "${knit_cmd}" && \
+pdflatex ${bn_no_ext} && \
+biber ${bn_no_ext} && \
+pdflatex ${bn_no_ext} && \
+pdflatex ${bn_no_ext}

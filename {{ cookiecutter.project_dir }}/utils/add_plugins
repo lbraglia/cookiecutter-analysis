@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+import os
+import datetime as dt
+import pylbmisc as lb
+from pathlib import Path
+
+root = Path(".")
+src_dir = root / "src"
+
+
+def addsomething(url, outfile, overwrite=False):
+    """Function to download stuff (plugin or udpdated tasks.py)"""
+    if outfile.exists() and not overwrite:
+        msg = f"File {outfile} already exists, download aborted."
+        print(msg)
+        return None
+    os.system(f"wget -O {outfile} {url}")
+
+
+def add_plugins():
+    """
+    Add plugins to current project
+    """
+    baseurl = "https://raw.githubusercontent.com/lbraglia/" \
+        "cookiecutter-analysis/refs/heads/main/plugins/"
+    plugins = ["randomization.py",
+               "estimates_validation.R",
+               "report.Rnw",
+               "report.tex",
+               "slides.Rnw"]
+    choices = lb.utils.menu(title="Specificare che plugin", choices=plugins)
+    if choices:
+        for f in choices:
+            url = baseurl + f
+            dest = src_dir / f
+            addsomething(url=url, outfile=dest, overwrite=False)
+
+
+if __name__=="__main__":
+    add_plugins()

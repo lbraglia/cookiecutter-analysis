@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+import configparser
+import shutil
+# import pylbmisc as lb
+from pathlib import Path
+
+# project
+root = Path(".")
+src_dir       = root / "src"
+tmp_dir       = root / "tmp"
+data_dir      = root / "data"
+outputs_dir   = root / "outputs"
+proj_dir      = root / "proj"
+docs_dir      = root / "proj" / "docs"
+common_biblio = root / "proj" / "biblio" / "common_biblio.bib"
+prj_biblio    = root / "proj" / "biblio" / "prj_biblio.bib"
+final_report  = root / "report.pdf"
+
+
+def get_metadata():
+    """Read/parse the project .ini file containing information inserted during
+    project creation."""
+    ini_path = proj_dir / "info.ini"
+    metadata = configparser.ConfigParser()
+    metadata.read(ini_path)
+    return metadata
+
+
+def zip():
+    """
+    Zippa il report.pdf/docx e file in prj/outputs per l'invio.
+    """
+    metadata = get_metadata()
+    acronym = metadata["project"]["acronym"]
+    pi = metadata["pi"]["surname"]
+    paste = f"{pi}_{acronym}"
+    # path to various things
+    out_fpath = Path(f"/tmp/{paste}")  # the zip directory to be zipped
+    figtab_fpath = out_fpath / "figure_tabelle"  # attachments
+    zip_fpath = Path(f"/tmp/{paste}.zip")  # the actual zip
+    # rm old stuff
+    if zip_fpath.exists():
+        zip_fpath.unlink()
+    if out_fpath.exists():
+        shutil.rmtree(out_fpath)
+    # copy outputs in out_fpath
+    shutil.copytree(outputs_dir, figtab_fpath)
+    # add reports in out_fpat
+    report_pdf = Path("report.pdf")
+    report_docx = Path("report.docx")
+    if report_pdf.exists():
+        shutil.copy(report_pdf, out_fpath)
+    if report_docx.exists():
+        shutil.copy(report_docx, out_fpath)
+    shutil.make_archive(str(zip_fpath.with_suffix("")),
+                        format="zip",
+                        root_dir=out_fpath)
+
+
+if __name__=="__main__":
+    zip()
