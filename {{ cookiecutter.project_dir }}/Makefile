@@ -24,6 +24,8 @@ test:
 init:
 	direnv allow
 	$(call utils,project_init)
+	# # quando si sarà nix-only
+	# direnv allow && $(call utils,project_init)
 
 add-data-generic:
 	@ python utils/add_data_generic
