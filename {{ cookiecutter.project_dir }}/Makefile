@@ -1,9 +1,10 @@
-DOCVIEWER=libreoffice
 EDITOR=emacs
-PDFVIEWER=okular
+PDF_VIEWER=okular
 RM=rm -rf
-RUNPY=uv run python
+RUNPY=python
 RUNR=R CMD BATCH --no-save --no-restore
+UVRUNPY=uv run python
+WORD_VIEWER=libreoffice --write --view
 
 define tg
 	winston_sends $1 group::lavoro
@@ -15,114 +16,124 @@ endef
 
 .PHONY: *
 
-default: test
+# default targets
+edit: edit-src
+compile: report
+view: view-report
+default: clean
 
-test:
-	${RUNR} src/asd.R
-
-
+clean:
+	@ ${RM} \
+	*.tex *.aux *.pytxcode *.toc *.log pythontex-files-* \
+	*.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md \
+	*.nav *.snm *.Rout *_files
+# -----------------------------
+# Project setup and mantainance
+# -----------------------------
 init:
-	direnv allow
-	$(call utils,project_init)
-	# # quando si sarà nix-only
-	# direnv allow && $(call utils,project_init)
+	@ # when nixos only: direnv allow && $(call utils,project_init)
+	@ direnv allow
+	@ $(call utils,project_init)
 
 add-data-generic:
-	@ python utils/add_data_generic
+	@ # do not use uv or nixos will require tkinter in each dir
+	@ ${RUNPY} utils/add_data_generic
 
 add-data-redcap:
-	@ python utils/add_data_redcap
+	@ # do not use uv or nixos will require tkinter in each dir
+	@ ${RUNPY} utils/add_data_redcap
 
 add-plugins:
 	@ $(call utils,add_plugins)
 
+add-protocol:
+	@ # do not use uv here, assume the user has tkinter lib (which is std)
+	@ # $(call utils,add_protocol)	
+	${RUNPY} utils/add_protocol
+
+venv-repl:
+	@ ${UVRUNPY}
+
+venv-sync:
+	@ uv sync
+
+venv-freeze:
+	@ $(call utils,venv_freeze)
+
+# ----------------
+# Edit/run/compile
+# ----------------
+edit-src:
+	@ ${EDITOR} src/*
+
+data-cleaning:
+	@ ${UVRUNPY} src/data_cleaning.py
+
+estimates-validation:
+	@ ${RUNR} src/estimates_validation.R
+
+report: report-rnw
+report-rnw:
+	@ $(call utils,compile_rnw,src/report.Rnw) &
+
+report-docx:
+	@ $(call utils,compile_qmd,src/report.qmd) && make view-report-docx &
+
+article:
+	@ $(call utils,compile_qmd,src/article.qmd) && make view-article &
+
+appendices:
+	@ $(call utils,compile_qmd,src/appendices.qmd) && make view-appendices &
+
+slides:
+	@ $(call utils,compile_rnw,src/slides.Rnw)
+
+# ----------
+# View stuff
+# ----------
+view-protocol:
+	@ ${PDF_VIEWER} proj/protocol/protocol.pdf &
+
+view-crf:
+	@ ${PDF_VIEWER} proj/crf/*.pdf &
+
+view-literature:
+	@ ${PDF_VIEWER} proj/literature/*.pdf &
+
+view-report: view-report-pdf
+view-report-pdf:
+	@ ${PDF_VIEWER} report.pdf
+
+view-report-docx:
+	@ ${WORD_VIEWER} report.docx
+
+view-article:
+	@ ${WORD_VIEWER} article.docx &
+
+view-appendices:
+	@ ${WORD_VIEWER} appendices.docx &
+
+view-slides:
+	@ ${PDF_VIEWER} slides.pdf &
+
+# ---------------
+# Outputs sending
+# ---------------
+tg-report-docx:
+	@ $(call tg,report.docx) &
+
+tg-report-pdf:
+	@ $(call tg,report.pdf) &
+
+tg-article:
+	@ $(call tg,article.docx) &
+
+tg-appendices:
+	@ $(call tg,appendices.docx) &
+
+tg-slides:
+	@ $(call tg,slides.pdf) &
+
 zip-results:
 	@ $(call utils,zip_results)
 
-compile: report-pdf
-
-view: view-report-pdf
-
-edit:
-	${EDITOR} src/*
-
-venv-repl:
-	${RUNPY}
-
-venv-sync:
-	uv sync
-
-venv-freeze:
-	$(call utils,venv_freeze)
-
-add-protocol:
-	@ # $(call utils,add_protocol)
-	@ # do not use uv here, assume the user has tkinter lib (which is std)
-	python utils/add_protocol
-
-estimates-validation:
-	${RUNR} src/estimates_validation.R
-
-
-article:
-	$(call utils,compile_qmd,src/article.qmd) && make view-article &
-
-appendices:
-	$(call utils,compile_qmd,src/appendices.qmd) && make view-appendices &
-
-report-rnw:
-	$(call utils,compile_rnw,src/report.Rnw) && make view-report-pdf &
-
-view-report-pdf:
-	${PDFVIEWER} report.pdf
-
-report-docx:
-	$(call utils,compile_qmd,src/report.qmd) && make view-report-docx &
-
-view-report-docx:
-	${DOCVIEWER} report.docx
-
-slides:
-	$(call utils,compile_rnw,src/slides.Rnw) && make view-slides &
-
-
-tg-report-docx:
-	$(call tg,report.docx) &
-
-tg-report-pdf:
-	$(call tg,report.pdf) &
-
-tg-article:
-	$(call tg,article.docx) &
-
-tg-appendices:
-	$(call tg,appendices.docx) &
-
-tg-slides:
-	$(call tg,slides.pdf) &
-
-
-view-protocol:
-	${PDFVIEWER} proj/protocol.pdf &
-
-view-crf:
-	${PDFVIEWER} proj/crf/*.pdf &
-
-view-literature:
-	${PDFVIEWER} proj/letteratura/*.pdf &
-
-view-article:
-	${DOCVIEWER} article.docx &
-
-view-appendices:
-	${DOCVIEWER} appendices.docx &
-
-view-slides:
-	${PDFVIEWER} slides.pdf &
-
-
-clean:
-	${RM} \
-	*.tex *.aux *.pytxcode *.toc *.log pythontex-files-* \
-	*.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md \
-	*.nav *.snm *.Rout *_files

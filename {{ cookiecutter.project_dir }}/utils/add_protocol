@@ -7,7 +7,7 @@ import datetime as dt
 from pathlib import Path
 from tkinter.filedialog import askopenfilename
 
-docs_dir = Path("proj/")
+docs_dir = Path("proj/protocol")
 
 def import_protocol():
     """
