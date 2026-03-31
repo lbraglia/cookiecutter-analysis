@@ -4,7 +4,8 @@ RM=rm -rf
 RUNPY=python
 RUNR=R CMD BATCH --no-save --no-restore
 UVRUNPY=uv run python
-WORD_VIEWER=libreoffice --write --view
+DOC_VIEWER=libreoffice --write --view
+XLS_VIEWER=libreoffice --calc --view
 
 define tg
 	winston_sends $1 group::lavoro
@@ -64,7 +65,7 @@ venv-freeze:
 # Edit/run/compile
 # ----------------
 edit-src:
-	@ ${EDITOR} src/*
+	@ ${EDITOR} src/* src/prjlib/src/prjlib/*.py
 
 data-cleaning:
 	@ ${UVRUNPY} src/data_cleaning.py
@@ -105,13 +106,13 @@ view-report-pdf:
 	@ ${PDF_VIEWER} report.pdf
 
 view-report-docx:
-	@ ${WORD_VIEWER} report.docx
+	@ ${DOC_VIEWER} report.docx
 
 view-article:
-	@ ${WORD_VIEWER} article.docx &
+	@ ${DOC_VIEWER} article.docx &
 
 view-appendices:
-	@ ${WORD_VIEWER} appendices.docx &
+	@ ${DOC_VIEWER} appendices.docx &
 
 view-slides:
 	@ ${PDF_VIEWER} slides.pdf &
