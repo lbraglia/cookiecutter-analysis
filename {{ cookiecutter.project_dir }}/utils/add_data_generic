@@ -44,7 +44,7 @@ def import_data(do_encryption=True):
         # add symlink
         symlink = data_dir / f"raw_dataset.xlsx{gpg_ext}"
         if symlink.exists():
-            symlink.rename(data_dir / "old_raw_dataset.xlsx")
+            symlink.rename(data_dir / f"old_raw_dataset.xlsx{gpg_ext}")
         symlink.symlink_to(outfile.relative_to(data_dir))
 
 

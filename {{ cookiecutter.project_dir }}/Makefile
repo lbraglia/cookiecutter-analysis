@@ -36,13 +36,11 @@ init:
 	@ direnv allow
 	@ $(call utils,project_init)
 
-add-data-generic:
+add-data:
 	@ # do not use uv or nixos will require tkinter in each dir
-	@ ${RUNPY} utils/add_data_generic
-
-add-data-redcap:
-	@ # do not use uv or nixos will require tkinter in each dir
-	@ ${RUNPY} utils/add_data_redcap
+	@ echo "Need to choose if using redcap or generic imports"
+	# @ ${RUNPY} utils/add_data_generic
+	# @ ${RUNPY} utils/add_data_redcap
 
 add-plugins:
 	@ $(call utils,add_plugins)
@@ -64,8 +62,9 @@ venv-freeze:
 # ----------------
 # Edit/run/compile
 # ----------------
+# last file as default open
 edit-src:
-	@ ${EDITOR} src/* src/prjlib/src/prjlib/*.py
+	@ ${EDITOR} src/* src/prjlib/src/prjlib/*.py data_cleaning.py &
 
 data-cleaning:
 	@ ${UVRUNPY} src/data_cleaning.py
