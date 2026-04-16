@@ -64,7 +64,7 @@ venv-freeze:
 # ----------------
 # last file as default open
 edit-src:
-	@ ${EDITOR} src/* src/prjlib/src/prjlib/*.py data_cleaning.py &
+	@ ${EDITOR} src/* src/prjlib/src/prjlib/*.py src/data_cleaning.py &
 
 data-cleaning:
 	@ ${UVRUNPY} src/data_cleaning.py
