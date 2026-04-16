@@ -57,14 +57,9 @@ testing = interactive = lb.utils.is_interactive()
 # dfs = dfs.drop(columns = rm)
 
 
-# # Unique values inspection/monitoring
-# # -----------------------------------
+# # Unique values/coercions
+# # -----------------------
 lb.dm.dump_unique_values(dfs)
-
-
-# # Type coercions: help(lb.dm.Coercer)
-# # -----------------------------------
-# # dput variable names
 lb.dm.names_list(dfs)
 
 
@@ -91,10 +86,23 @@ df_coercions = {
     # variabili che si vogliono tenere immodificate con keep_coerced_only in
     # Coercer.coerce sotto identity    
     # lb.dm.identity: [],
-    lb.dm.to_sex: ["sex"],
-    to_variable: ["variable"],
-    livello_educativo: ["titstu"],
-    stato_civile: ["civstat"]
+    lb.dm.to_integer: [
+        
+    ],
+    lb.dm.to_numeric: [
+        
+    ],
+    lb.dm.to_noyes: [
+        
+    ],
+    lb.dm.to_categorical: [
+        
+    ],
+    lb.dm.to_date: [
+        
+    ],
+    # livello_educativo: ["titstu"],
+    # stato_civile: ["civstat"]
 }
 
 
