@@ -154,7 +154,7 @@ def init():
     # -----------------------------------------------------------
     print("Logseq page")
     # -----------------------------------------------------------
-    logseq_page = brain / (metadata["project"]["dir"] + ".md")
+    logseq_page = brain / (metadata["project"]["name"] + ".md")
     if logseq_page.exists():
         print("logseq page already available, skipping.")
     else:

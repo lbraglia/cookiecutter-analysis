@@ -1,5 +1,5 @@
 [project]
-name = "{{cookiecutter.pi_surname.lower()}}_{{cookiecutter.project_acronym}}"
+name = "{{cookiecutter.pi_surname.lower().replace(' ','')}}_{{cookiecutter.project_acronym.replace(' ','')}}"
 version = "0.1.0"
 description = "{{cookiecutter.project_description}}"
 acronym = "{{cookiecutter.project_acronym}}"
