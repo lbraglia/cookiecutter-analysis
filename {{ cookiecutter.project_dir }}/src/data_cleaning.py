@@ -1,11 +1,8 @@
 import pylbmisc as lb
 from pylbmisc.r import *
 import pprint
-# prj specific common code
-import prjlib as prj
-import importlib # importlib.reload(prj)
+import prjlib as prj   # prj specific common code
 testing = interactive = lb.utils.is_interactive()
-
 
 # # Data import
 # # -----------
@@ -17,12 +14,19 @@ testing = interactive = lb.utils.is_interactive()
 # except NameError:
 #     dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
 
+# if False:
+#     view(dfs)
+
+
 # # redcap export import (data/DATA.csv, data/LABELS.csv)
 # try:
 #     df
 # except NameError:
 #     df, vd = lb.io.import_redcap()
-# pprint.pp(vd)
+
+# if False:
+#     view(df)
+#     pprint.pp(vd)
 
 # # # Sanitize variable names, keeping as comment
 # # # -------------------------------------------
