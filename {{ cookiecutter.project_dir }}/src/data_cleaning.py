@@ -6,13 +6,11 @@ testing = interactive = lb.utils.is_interactive()
 
 # # Data import
 # # -----------
-# try used in order to avoid GPG import every run
-
 # # standard generic (old) import
 # try:
 #     dfs
 # except NameError:
-#     dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
+#     raw_dfs = dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
 
 # if False:
 #     view(dfs)
@@ -101,6 +99,9 @@ df_coercions = {
     lb.dm.to_date: [
         
     ],
+    lb.dm.mr_split: [
+        
+    ],
     # livello_educativo: ["titstu"],
     # stato_civile: ["civstat"]
 }
@@ -152,15 +153,12 @@ df = df.assign(
 
 # # Keep-rename for final datasets
 # # ------------------------------
-keep_rename = {
-    # keep : rename_to
-    "id_paziente": "id",
-    "sesso": "sex",
-}
-
-
-keep = list(keep_rename.keys())
-df = df[keep]  #.rename(columns=keep_rename)
+# keep_rename = {
+#     # keep : rename_to
+#     "id_paziente": "id",
+#     "sesso": "sex",
+# }
+# df = lb.dm.dfkeeprn(df, keep_rename)
 
 # # Export for analysis
 # # -------------------
