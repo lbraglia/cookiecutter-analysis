@@ -33,7 +33,7 @@ clean:
 # -----------------------------
 init:
 	@ # when nixos only: direnv allow && $(call utils,project_init)
-	@ direnv allow
+	# @ direnv allow
 	@ $(call utils,project_init)
 
 add-data:
