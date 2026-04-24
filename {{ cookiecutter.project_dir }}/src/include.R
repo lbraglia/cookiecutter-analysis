@@ -39,8 +39,9 @@ shut_up <- lapply(
   list.files(Sys.glob("tmp"), pattern = glob2rx("clean_*.R"), full.names = TRUE),
   function(x) source(x)
 )
+rm(shut_up)
 
 # pretty printing of tableone for descriptives
 if (exists("db_des")){
-  db_des <- pretty_varnames(db_des)
+  names(db_des) <- pretty_text(names(db_des))
 }
