@@ -35,8 +35,12 @@ library(lbstat)
 ## -------------------------------------------------------------
 
 # importazione dati
-source("tmp/clean_df.R")
+shut_up <- lapply(
+  list.files(Sys.glob("tmp"), pattern = glob2rx("clean_*.R"), full.names = TRUE),
+  function(x) source(x)
+)
 
-## dput(names(df))
-des_vars <- names(df)  # identity by default
-df_des <- df[des_vars]
+# pretty printing of tableone for descriptives
+if (exists("db_des")){
+  db_des <- pretty_varnames(db_des)
+}

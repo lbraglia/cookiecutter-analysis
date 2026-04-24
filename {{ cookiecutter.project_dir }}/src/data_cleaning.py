@@ -163,4 +163,4 @@ df = df.assign(
 # # Export for analysis
 # # -------------------
 lb.io.export_data(df, "tmp/clean_df")
-# lb.io.export_data({"df": df, "df2": df2}, "tmp/clean")
+# lb.io.export_data({"db": df, "db_des": df_des}, "tmp/clean", ext=".R")
