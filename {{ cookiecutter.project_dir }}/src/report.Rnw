@@ -44,7 +44,11 @@ Descrittive in tabella \ref{tab:descriptives}
 # per stratificate inserire nome variabile e decommentare
 var_colonna <- "gruppo"
 lbstat::tableone(
-  data = df_des,
+  data = {
+    tmp <- db_des
+    names(tmp) <- gsub("_", " ", names(tmp))
+    tmp
+  },
   ## strata = var_colonna,
   wb = wb,
   test = FALSE,
