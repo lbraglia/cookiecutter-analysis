@@ -29,7 +29,7 @@ def _setup_redcap_file(input_path, is_label, do_encryption):
         symlink.rename(old_symlink)
     # cp data
     if do_encryption:
-        cmd = "gpg --encrypt --recipient lbraglia@gmail.com" \
+        cmd = "gpg --encrypt --recipient luca.braglia@ausl.re.it" \
             f" --output {outfile} {input_path}"
         os.system(cmd)
     else:
