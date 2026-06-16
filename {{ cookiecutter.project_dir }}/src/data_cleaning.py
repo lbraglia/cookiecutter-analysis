@@ -2,33 +2,34 @@ import pylbmisc as lb
 from pylbmisc.r import *
 import pprint
 import prjlib as prj   # prj specific common code
+import os
 testing = interactive = lb.utils.is_interactive()
 
 # # Data import
 # # -----------
-# # standard generic (old) import
+# # standard/old import
 # try:
-#     dfs
+#     raw_dfs
 # except NameError:
-#     raw_dfs = dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
+#     raw_dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
+
+# # redcap import
+# try:
+#     raw_df
+# except NameError:
+#     raw_df, vd = lb.io.import_redcap()
 
 # if False:
-#     view(dfs)
-
-
-# # redcap export import (data/DATA.csv, data/LABELS.csv)
-# try:
-#     df
-# except NameError:
-#     df, vd = lb.io.import_redcap()
-
-# if False:
-#     view(df)
+#     lb.io.export_data(raw_dfs, "/tmp/rawdata.xlsx")
+#     os.system("libreoffice /tmp/rawdata.xlsx &")
+#     os.system("make view-crf &")
+#     os.system("make view-protocol &")
 #     pprint.pp(vd)
+
 
 # # # Sanitize variable names, keeping as comment
 # # # -------------------------------------------
-# dfs, comments = lb.dm.fix_varnames(dfs, return_tfd=True)
+# dfs, comments = lb.dm.fix_varnames(raw_dfs, return_tfd=True)
 
 # if testing:
 #     if isinstance(dfs, dict):
@@ -162,5 +163,9 @@ df = df.assign(
 
 # # Export for analysis
 # # -------------------
-lb.io.export_data(df, "tmp/clean_df")
-# lb.io.export_data({"db": df, "db_des": df_des}, "tmp/clean", ext=".R")
+export_dict = {"db": df, "db_des": df_des}
+lb.io.export_data(export_dict, "tmp/clean", ext=".R")
+
+if False:
+    lb.io.export_data(export_dict, "/tmp/final_dbs.xlsx")
+    os.system("libreoffice /tmp/final_dbs.xlsx &")

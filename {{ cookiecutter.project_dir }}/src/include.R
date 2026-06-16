@@ -8,9 +8,9 @@ opts_chunk$set(
   strip.white = TRUE,
   tidy        = FALSE,
   echo        = FALSE,
-  error       = TRUE,
-  warning     = TRUE,
-  message     = TRUE,
+  error       = FALSE,
+  warning     = FALSE,
+  message     = FALSE,
   dpi         = 600,
   dev         = c('png', 'tiff', 'cairo_ps', 'pdf')[c(1, 3, 4)],
   fig.width   = inches(cm = 8.5),  # dimensioni default journal

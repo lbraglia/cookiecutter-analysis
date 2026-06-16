@@ -49,6 +49,7 @@ lbstat::tableone(
   wb = wb,
   test = FALSE,
   showAllLevels = TRUE,
+  includeNA = TRUE,
   label = "descriptives",
   caption = "Descriptives",
   sheet = "descriptives")
