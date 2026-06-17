@@ -12,6 +12,7 @@ testing = interactive = lb.utils.is_interactive()
 #     raw_dfs
 # except NameError:
 #     raw_dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
+#     dfs, comments = lb.dm.fix_varnames(raw_dfs, return_tfd=True)
 
 # # redcap import
 # try:
@@ -27,17 +28,9 @@ testing = interactive = lb.utils.is_interactive()
 #     pprint.pp(vd)
 
 
-# # # Sanitize variable names, keeping as comment
-# # # -------------------------------------------
-# dfs, comments = lb.dm.fix_varnames(raw_dfs, return_tfd=True)
-
-# if testing:
-#     if isinstance(dfs, dict):
-#         print(list(dfs.keys()))
-
-
-# # Renaming eventuale per evitare che il codice a valle si sporchi
-# # ---------------------------------------------------------------
+# # Rimozione variabili, eventuale renaming per pulizia codice a valle
+# # ------------------------------------------------------------------
+# rm = ["scanner_y", "outcome_finale_y","aace_ace_ame", "eu_tirads", "suv_max"]
 # ft = {
 #     "categoria_ecografica_finale": "eco",
 #     "eta": "age",
@@ -45,19 +38,11 @@ testing = interactive = lb.utils.is_interactive()
 #     "anno": "year",
 #     "fumo_0_attivo_1_pregresso_2_mai": "smoke",
 # }
-# dfs = dfs.rename(columns=ft)
-
-# rimozione variabili da non considerare
-# --------------------------------------
-# rm = ["scanner_y", "outcome_finale_y",
-#       "aace_ace_ame", "eu_tirads",
-#       "suv_max"
-# ]
-# dfs = dfs.drop(columns = rm)
+# dfs = dfs.drop(columns = rm).rename(columns=ft)
 
 
-# # Unique values/coercions
-# # -----------------------
+# Coercions/recoding
+# ------------------
 lb.dm.dump_unique_values(dfs)
 lb.dm.names_list(dfs)
 
@@ -120,29 +105,22 @@ df.select_dtypes("string[pyarrow]").columns.to_list()
 
 
 
-# # variable renaming for multiple dataset
+# # variable renaming and merging for multiple dataset
+# # --------------------------------------------------
 # socio = socio.rename(columns={"cognome": "id"})
-# mal = mal.rename(columns=lambda x: "mal_" + x if x != "cognome" else "id")
-# lav = lav.rename(columns=lambda x: "lav_" + x if x != "cognome" else "id")
-# sal = sal.rename(columns=lambda x: "sal_" + x if x != "cognome" else "id")
-# bis = bis.rename(columns=lambda x: "bis_" + x if x != "cognome" else "id")
+# mal = mal.rename(columns=lambda x: "mal_" + x if x != "cognome" else "patient_id")
+# lav = lav.rename(columns=lambda x: "lav_" + x if x != "cognome" else "patient_id")
+# sal = sal.rename(columns=lambda x: "sal_" + x if x != "cognome" else "patient_id")
+# bis = bis.rename(columns=lambda x: "bis_" + x if x != "cognome" else "patient_id")
+#
+# df = functools.reduce(
+#     lambda x,y: pd.merge(x, y, on="patient_id", how="left", validate="1:1"),
+#     [socio, mal, lav, sal, bis]
+# )
 
 
-# # merging multiple dataset
-# df = pd.merge(socio, mal,
-#               left_on="id",
-#               right_on="id",
-#               suffixes=(None, None))
-
-
-# def merger(x, y):
-#     return pd.merge(x, y,
-#                     left_on=["id", "time"],
-#                     right_on=["id", "time"],
-#                     suffixes=(None, None))
-
-
-# df = functools.reduce(merger, [df, lav, sal, bis])
+# Data validation
+# ---------------
 
 
 # # Variabili derivate
@@ -163,7 +141,7 @@ df = df.assign(
 
 # # Export for analysis
 # # -------------------
-export_dict = {"db": df, "db_des": df_des}
+export_dict = {"db": df, "db_des": df[prj.des_vars]}
 lb.io.export_data(export_dict, "tmp/clean", ext=".R")
 
 if False:
