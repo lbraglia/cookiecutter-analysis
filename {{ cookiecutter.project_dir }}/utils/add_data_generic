@@ -1,11 +1,8 @@
 #!/usr/bin/env python
-# import os
-# import shutil
-# import subprocess
-# import datetime as dt
-import pylbmisc as lb
 from pathlib import Path
 from tkinter.filedialog import askopenfilename
+from pylbmisc.io2 import import_data
+from pylbmisc.io2 import export_data
 
 # -----
 # PATHS
@@ -13,14 +10,14 @@ from tkinter.filedialog import askopenfilename
 
 # project
 root = Path(".")
-data_dir      = root / "data"
+data_dir = root / "data"
 
 # ----
 # UTILS
 # ----
 
 
-def import_data(do_encryption=True):
+def import_generic_dataset(do_encryption=True):
     """
     Import latest dataset and set up proper symlinks.
     """
@@ -37,10 +34,10 @@ def import_data(do_encryption=True):
             filetypes=filetypes, multiple=True
         )
         # import data
-        dfs = lb.io.import_data(fpaths, csv_kwargs={"dtype_backend":"pyarrow"})
+        dfs = import_data(fpaths)
         # save as a single excel file
         outfile = data_dir / f"raw_dataset_{dataset_date}.xlsx{gpg_ext}"
-        lb.io.export_data(x=dfs, path=outfile.absolute(), index=False)
+        export_data(x=dfs, path=outfile.absolute())
         # add symlink
         symlink = data_dir / f"raw_dataset.xlsx{gpg_ext}"
         if symlink.exists():
@@ -50,4 +47,4 @@ def import_data(do_encryption=True):
 
 
 if __name__=="__main__":
-    import_data()
+    import_generic_dataset()
