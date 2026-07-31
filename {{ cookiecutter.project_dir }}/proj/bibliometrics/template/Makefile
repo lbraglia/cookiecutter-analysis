@@ -1,5 +1,5 @@
 search:
-	pubmed_search '"method comparison studies[tiab]"'
+	pubmed_search
 
 biblio_citations:
 	biblio_citations search_results.csv
