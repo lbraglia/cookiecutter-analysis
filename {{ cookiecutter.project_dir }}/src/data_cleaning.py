@@ -11,18 +11,17 @@ testing = interactive = lb.utils.is_interactive()
 # try:
 #     raw_dfs
 # except NameError:
-#     raw_dfs = lb.io.import_data("data/raw_dataset.xlsx.gpg")
-#     dfs, comments = lb.dm.fix_varnames(raw_dfs, return_tfd=True)
+#     raw_dfs = lb.io2.import_data("data/raw_dataset.xlsx.gpg")
+#     dfs, comments = lb.dm2.fix_varnames(raw_dfs, return_tfd=True)
 
 # # redcap import
 # try:
 #     raw_df
 # except NameError:
-#     raw_df, vd = lb.io.import_redcap()
+#     raw_df, vd = lb.io2.import_redcap()
 
 # if False:
-#     lb.io.export_data(raw_dfs, "/tmp/rawdata.xlsx")
-#     os.system("libreoffice /tmp/rawdata.xlsx &")
+#     lb.r.view(raw_dfs)
 #     os.system("make view-crf &")
 #     os.system("make view-protocol &")
 #     pprint.pp(vd)
@@ -30,7 +29,6 @@ testing = interactive = lb.utils.is_interactive()
 
 # # Rimozione variabili, eventuale renaming per pulizia codice a valle
 # # ------------------------------------------------------------------
-# rm = ["scanner_y", "outcome_finale_y","aace_ace_ame", "eu_tirads", "suv_max"]
 # ft = {
 #     "categoria_ecografica_finale": "eco",
 #     "eta": "age",
@@ -38,25 +36,18 @@ testing = interactive = lb.utils.is_interactive()
 #     "anno": "year",
 #     "fumo_0_attivo_1_pregresso_2_mai": "smoke",
 # }
-# dfs = dfs.drop(columns = rm).rename(columns=ft)
+# dfs = dfs.select(ft.keys()).rename(ft)
 
 
 # Coercions/recoding
 # ------------------
-lb.dm.dump_unique_values(dfs)
-lb.dm.names_list(dfs)
-
-
-# prepare coercion
-def to_variable(x):
-    levels = [0, 1, 2, 3, 4, 5]
-    labels = ["IgG", "IgA", "LC", "IgD", "IgM", "NS"]
-    return lb.dm.to_categorical(x, levels=levels, labels=labels)
+lb.dm2.dump_unique_values(dfs)
+lb.dm2.names_list(dfs)
 
 
 # using mc function factory for quicker categoricals
-livello_educativo = lb.dm.mc(["Media", "Superiore", "Laurea"])
-stato_civile = lb.dm.mc(
+livello_educativo = lb.dm2.enum_parser(["Media", "Superiore", "Laurea"])
+stato_civile = lb.dm2.enum_parser(
     levels=[0, 1, 2, 3, 4],
     labels=["Sposata/Convivente",
             "Divorziata/Separata/Vedova",
@@ -69,39 +60,37 @@ stato_civile = lb.dm.mc(
 df_coercions = {
     # variabili che si vogliono tenere immodificate con keep_coerced_only in
     # Coercer.coerce sotto identity    
-    # lb.dm.identity: [],
-    lb.dm.to_integer: [
+    # lb.dm2.identity: [],
+    lb.dm2.to_integer: [
         
     ],
-    lb.dm.to_numeric: [
+    lb.dm2.to_numeric: [
         
     ],
-    lb.dm.to_noyes: [
+    lb.dm2.to_noyes: [
         
     ],
-    lb.dm.to_categorical: [
+    lb.dm2.to_sex: [
         
     ],
-    lb.dm.to_date: [
-        
-    ],
-    lb.dm.mr_split: [
+    lb.dm2.to_date: [
         
     ],
     # livello_educativo: ["titstu"],
     # stato_civile: ["civstat"]
 }
 
+mc = {
+    lb.dm2.to_multiple_choices: [
+        
+    ],
+}
 
 # # single dataset
-dfs = dfs.set_index("sud_codpaz")
-df = lb.dm.Coercer(dfs, df_coercions).coerce()
+df = lb.dm2.Coercer(dfs, df_coercions, mc).coerce()
 # # multiple datasets
-# clean_df  = lb.dm.Coercer(dfs["df"], df_coercions).coerce()
-# clean_df2 = lb.dm.Coercer(dfs["df2"], df2_coercions).coerce()
-
-# stringhe rimanenti
-df.select_dtypes("string[pyarrow]").columns.to_list()
+# clean_df  = lb.dm2.Coercer(dfs["df"], df_coercions).coerce()
+# clean_df2 = lb.dm2.Coercer(dfs["df2"], df2_coercions).coerce()
 
 
 
@@ -132,18 +121,17 @@ df = df.assign(
 
 # # Keep-rename for final datasets
 # # ------------------------------
-# keep_rename = {
+# krn = {
 #     # keep : rename_to
 #     "id_paziente": "id",
 #     "sesso": "sex",
 # }
-# df = lb.dm.dfkeeprn(df, keep_rename)
+# df = df.select(krn.keys()).rename(krn)
 
 # # Export for analysis
 # # -------------------
 export_dict = {"db": df, "db_des": df[prj.des_vars]}
-lb.io.export_data(export_dict, "tmp/clean", ext=".R")
+lb.io2.export_data(export_dict, "tmp/clean", ext=".R")
 
 if False:
-    lb.io.export_data(export_dict, "/tmp/final_dbs.xlsx")
-    os.system("libreoffice /tmp/final_dbs.xlsx &")
+    lb.r.view(export_dict)
