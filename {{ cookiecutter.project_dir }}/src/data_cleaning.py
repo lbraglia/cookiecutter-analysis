@@ -114,10 +114,15 @@ df = lb.dm2.Coercer(dfs, df_coercions, mc).coerce()
 
 # # Variabili derivate
 # # ------------------
-df = df.assign(
-    x=lambda _df: (_df.whatever).astype(""),
-    y=lambda _df: (_df.whatever).astype("")
-)
+# df = df.with_columns(
+#     date=lb.dm2.to_date("date"),
+#     date_dmy=lb.dm2.to_date_dmy("date_dmy"),
+#     date_dmy2=lb.dm2.date_parser("%d/%m/%Y")("date_dmy2"),
+#     da_state=lb.dm2.enum_parser(levels=["Ohio", "Nevada"], labels=["aio", "gal"])(
+#         "state"
+#     ),
+# )
+
 
 # # Keep-rename for final datasets
 # # ------------------------------
@@ -132,6 +137,6 @@ df = df.assign(
 # # -------------------
 export_dict = {"db": df, "db_des": df[prj.des_vars]}
 lb.io2.export_data(export_dict, "tmp/clean", ext=".R")
-
 if False:
     lb.r.view(export_dict)
+
