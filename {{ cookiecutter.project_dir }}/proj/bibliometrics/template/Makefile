@@ -8,7 +8,7 @@ top_biblio:
 	head -n 100 search_results_bibliocitations.csv > top100biblio.csv
 
 top_biblio_info:
-	doi2info top100biblio.csv && libreoffice top100biblio_info.xlsx
+	doi2info top100biblio.csv && libreoffice top100biblio_info.csv
 
 tg_results:
 	winston_sends top100biblio_info.xlsx group::lavoro
