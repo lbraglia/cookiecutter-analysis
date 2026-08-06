@@ -24,8 +24,7 @@ jupyter: python3
 ```{python}
 #| label: setup
 
-# import numpy as np
-# import pandas as pd
+# import polars as pl
 # import matplotlib.pyplot as plt
 # import tableone
 import pylbmisc as lb
