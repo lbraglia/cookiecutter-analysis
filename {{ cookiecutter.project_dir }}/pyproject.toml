@@ -25,3 +25,7 @@ uo = "{{cookiecutter.pi_uo}}"
 pylbmisc = { path = "../../.src/pypkg/pylbmisc", editable = true }
 prjlib = { path = "src/prjlib", editable = true }
 
+[dependency-groups]
+dev = [
+    "ruff",
+]

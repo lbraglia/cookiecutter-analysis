@@ -27,3 +27,6 @@ _codebraid
 uv.lock
 .RData
 .direnv
+
+proj/protocol_revisions/*/*.pdf
+
