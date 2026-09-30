@@ -1,2 +1,2 @@
-ctg-review:
-	uv run src/ctg_protocols_sap_review.py
+search:
+	uv run protocols_search.py
