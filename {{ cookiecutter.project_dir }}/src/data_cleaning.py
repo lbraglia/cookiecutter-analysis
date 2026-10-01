@@ -1,48 +1,37 @@
-import pylbmisc as lb
-from pylbmisc.r import *
-import pprint
-import prjlib as prj   # prj specific common code
 import os
+import prjlib as prj
+import pylbmisc as lb
+from pprint import pp
+from pylbmisc.r import *
+
 testing = interactive = lb.utils.is_interactive()
 
-# # Data import
-# # -----------
+# Data import
+# -----------
 # # standard/old import
-# try:
-#     raw_dfs
-# except NameError:
-#     raw_dfs = lb.io2.import_data("data/raw_dataset.xlsx.gpg")
-#     dfs, comments = lb.dm2.fix_varnames(raw_dfs, return_tfd=True)
-
-# # redcap import
 # try:
 #     raw_df
 # except NameError:
-#     raw_df, vd = lb.io2.import_redcap()
+#     raw_df = lb.io2.import_data("data/raw_dataset.xlsx.gpg")
+#     raw_df, vd = lb.dm2.fix_varnames(raw_df, return_tfd=True)
 
-# if False:
-#     lb.r.view(raw_dfs)
-#     os.system("make view-crf &")
-#     os.system("make view-protocol &")
-#     pprint.pp(vd)
+# redcap import
+try:
+    raw_df
+except NameError:
+    raw_df, vd = lb.io2.import_redcap()
 
+if False:
+    lb.r.view(raw_df)
+    os.system("make view-crf &")
+    os.system("make view-protocol &")
+    pp(vd)
 
-# # Rimozione variabili, eventuale renaming per pulizia codice a valle
-# # ------------------------------------------------------------------
-# ft = {
-#     "categoria_ecografica_finale": "eco",
-#     "eta": "age",
-#     "sesso_0_f_1_m": "sex",
-#     "anno": "year",
-#     "fumo_0_attivo_1_pregresso_2_mai": "smoke",
-# }
-# dfs = dfs.select(ft.keys()).rename(ft)
-
-
+    
 # Coercions/recoding
 # ------------------
-lb.dm2.dump_unique_values(dfs)
-lb.dm2.names_list(dfs)
+lb.dm2.dump_unique_values(raw_df)
+lb.dm2.names_list(raw_df)
 
 
 # using mc function factory for quicker categoricals
@@ -87,7 +76,7 @@ mc = {
 }
 
 # # single dataset
-df = lb.dm2.Coercer(dfs, df_coercions, mc).coerce()
+df = lb.dm2.Coercer(raw_df, df_coercions, mc).coerce()
 # # multiple datasets
 # clean_df  = lb.dm2.Coercer(dfs["df"], df_coercions).coerce()
 # clean_df2 = lb.dm2.Coercer(dfs["df2"], df2_coercions).coerce()
@@ -136,7 +125,7 @@ df = lb.dm2.Coercer(dfs, df_coercions, mc).coerce()
 # # Export for analysis
 # # -------------------
 export_dict = {"db": df, "db_des": df[prj.des_vars]}
-lb.io2.export_data(export_dict, "tmp/clean", ext=".R")
+lb.io2.export_data(export_dict, "tmp/clean", ext=[".R", ".pkl"])
 if False:
     lb.r.view(export_dict)
 
