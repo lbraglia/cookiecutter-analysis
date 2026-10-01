@@ -59,24 +59,6 @@ qui e` in landscape
 :::
 qui non piu`
 
-- per andare a pagina nuova (lasciare linea prima e dopo)
-
-{{< pagebreak >}}
-
-
-- Per rimuovere sezioni
-
-```{python}
-#| output: asis
-lb.io.hide_if(True)
-```
-
-Questa frase non viene stampata.
-
-```{python}
-#| output: asis
-lb.io.hide_fi(True)
-```
 
 -->
 
