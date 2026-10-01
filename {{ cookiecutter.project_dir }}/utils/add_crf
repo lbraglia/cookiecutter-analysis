@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+import configparser
+import os
+import shutil
+import subprocess
+import datetime as dt
+from pathlib import Path
+from tkinter.filedialog import askopenfilename
+
+docs_dir = Path("proj/crf")
+
+def import_crf():
+    """
+    Import crf with date as today
+    """
+    today = dt.date.today().isoformat().replace("-","_")
+    outfile = docs_dir / f"crf_{today}.pdf"
+    symlink = docs_dir / "crf.pdf"
+    title = "Select the CRF file to be imported"
+    initialdir = "/tmp"
+    filetypes = [("Formati", ".docx .doc .pdf")]
+    fpath = Path(askopenfilename(title=title,
+                                 initialdir=initialdir,
+                                 filetypes=filetypes))
+    if fpath.suffix == ".pdf":
+        # just copy the .pdf file
+        shutil.copy(fpath, outfile.absolute())
+    else:
+        # convert with libreoffice
+        libreoffice_export = Path("/tmp") / (fpath.stem + '.pdf')
+        if libreoffice_export.exists():
+            libreoffice_export.unlink()
+        os.system(f"libreoffice --headless --convert-to pdf {fpath} --outdir /tmp")
+        shutil.copy(libreoffice_export, outfile.absolute())
+    # smart symlinks
+    if symlink.exists():
+        symlink.unlink()
+    symlink.symlink_to(outfile.relative_to(docs_dir))
+
+if __name__=="__main__":
+    import_crf()

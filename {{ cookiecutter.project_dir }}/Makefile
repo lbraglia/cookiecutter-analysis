@@ -42,13 +42,17 @@ add-data:
 	# @ ${RUNPY} utils/add_data_generic
 	# @ ${RUNPY} utils/add_data_redcap
 
-add-plugins:
-	@ $(call utils,add_plugins)
-
 add-protocol:
 	@ # do not use uv here, assume the user has tkinter lib (which is std)
 	@ # $(call utils,add_protocol)	
 	${RUNPY} utils/add_protocol
+
+add-crf:
+	${RUNPY} utils/add_crf
+
+
+add-plugins:
+	@ $(call utils,add_plugins)
 
 venv-repl:
 	@ ${UVRUNPY}
