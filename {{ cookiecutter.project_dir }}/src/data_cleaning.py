@@ -1,6 +1,8 @@
 import os
 import prjlib as prj
 import pylbmisc as lb
+from pylbmisc import dm2 as dm
+from pylbmisc import io2 as io
 from pprint import pp
 from pylbmisc.r import *
 
@@ -12,17 +14,17 @@ testing = interactive = lb.utils.is_interactive()
 # try:
 #     raw_df
 # except NameError:
-#     raw_df = lb.io2.import_data("data/raw_dataset.xlsx.gpg")
-#     raw_df, vd = lb.dm2.fix_varnames(raw_df, return_tfd=True)
+#     raw_df = io.import_data("data/raw_dataset.xlsx.gpg")
+#     raw_df, vd = dm.fix_varnames(raw_df, return_tfd=True)
 
 # redcap import
 try:
     raw_df
 except NameError:
-    raw_df, vd = lb.io2.import_redcap()
+    df, raw_df, labels, vd = io.import_redcap(idvarprog=0)
 
 if False:
-    lb.r.view(raw_df)
+    lb.r.view(df)
     os.system("make view-crf &")
     os.system("make view-protocol &")
     pp(vd)
@@ -30,13 +32,13 @@ if False:
     
 # Coercions/recoding
 # ------------------
-lb.dm2.dump_unique_values(raw_df)
-lb.dm2.names_list(raw_df)
+dm.dump_unique_values(raw_df)
+dm.names_list(raw_df)
 
 
 # using mc function factory for quicker categoricals
-livello_educativo = lb.dm2.enum_parser(["Media", "Superiore", "Laurea"])
-stato_civile = lb.dm2.enum_parser(
+livello_educativo = dm.enum_parser(["Media", "Superiore", "Laurea"])
+stato_civile = dm.enum_parser(
     levels=[0, 1, 2, 3, 4],
     labels=["Sposata/Convivente",
             "Divorziata/Separata/Vedova",
@@ -49,20 +51,20 @@ stato_civile = lb.dm2.enum_parser(
 df_coercions = {
     # variabili che si vogliono tenere immodificate con keep_coerced_only in
     # Coercer.coerce sotto identity    
-    # lb.dm2.identity: [],
-    lb.dm2.to_integer: [
+    # dm.identity: [],
+    dm.to_integer: [
         
     ],
-    lb.dm2.to_numeric: [
+    dm.to_numeric: [
         
     ],
-    lb.dm2.to_noyes: [
+    dm.to_noyes: [
         
     ],
-    lb.dm2.to_sex: [
+    dm.to_sex: [
         
     ],
-    lb.dm2.to_date: [
+    dm.to_date: [
         
     ],
     # livello_educativo: ["titstu"],
@@ -70,13 +72,13 @@ df_coercions = {
 }
 
 mc = {
-    lb.dm2.to_multiple_choices: [
+    dm.to_multiple_choices: [
         
     ],
 }
 
 # # single dataset
-df = lb.dm2.Coercer(raw_df, df_coercions, mc).coerce()
+df = dm.Coercer(df, df_coercions, mc).coerce()
 # # multiple datasets
 # clean_df  = lb.dm2.Coercer(dfs["df"], df_coercions).coerce()
 # clean_df2 = lb.dm2.Coercer(dfs["df2"], df2_coercions).coerce()
@@ -125,7 +127,7 @@ df = lb.dm2.Coercer(raw_df, df_coercions, mc).coerce()
 # # Export for analysis
 # # -------------------
 export_dict = {"db": df, "db_des": df[prj.des_vars]}
-lb.io2.export_data(export_dict, "tmp/clean", ext=[".R", ".pkl"])
+io.export_data(export_dict, "tmp/clean", ext=[".R", ".pkl"])
 if False:
     lb.r.view(export_dict)
 
