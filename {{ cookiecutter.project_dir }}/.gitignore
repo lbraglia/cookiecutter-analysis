@@ -30,3 +30,4 @@ uv.lock
 
 proj/protocol_revisions/*/*.pdf
 
+*_files
