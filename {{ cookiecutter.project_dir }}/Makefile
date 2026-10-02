@@ -20,6 +20,7 @@ endef
 # default targets
 edit: edit-src
 compile: report
+report: report-rnw
 view: view-report
 default: clean
 
@@ -76,7 +77,6 @@ data-cleaning:
 estimates-validation:
 	@ ${RUNR} src/estimates_validation.R
 
-report: report-rnw
 report-rnw:
 	@ $(call utils,compile_rnw,src/report.Rnw) &
 

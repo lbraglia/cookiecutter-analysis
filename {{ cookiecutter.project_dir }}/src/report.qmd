@@ -8,8 +8,8 @@ fig-height: 3.346
 fig-format: png
 fig-dpi: 600
 format: 
-  pdf:
-    pdf-engine: pdflatex
+  docx:
+    toc: true
 bibliography: 
   - proj/biblio/common_biblio.bib
   - proj/biblio/prj_biblio.bib
@@ -21,7 +21,7 @@ execute:
 jupyter: python3
 ---
 
-```python
+```{python}
 #| label: setup
 
 # import polars as pl
@@ -36,8 +36,9 @@ dfs = io.import("tmp/clean.pkl")
 
 ```
 
-```python
-
+```{python}
+#| label: descrittive
+#| output: asis
 tabs = lb.stats.Tables(dfs["db_des"], vars_des=dfs["vd"])
 tabs.to_quarto()
 exported_tab.update(tabs.to_excel())
@@ -45,7 +46,7 @@ exported_tab.update(tabs.to_excel())
 ```
 
 
-```python
+```{python}
 #| label: export-tables
 
 io.export_data(exported_tab, "outputs/tables.xlsx", excel_kwargs =  {"autofilter": False})
