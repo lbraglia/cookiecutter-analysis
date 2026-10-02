@@ -21,25 +21,35 @@ execute:
 jupyter: python3
 ---
 
-```{python}
+```python
 #| label: setup
 
 # import polars as pl
 # import matplotlib.pyplot as plt
 # import tableone
 import pylbmisc as lb
+from pylbmisc import io2 as io
 from pylbmisc.r import *
 testing = lb.utils.is_interactive()
-df = lb.io2.import("tmp/clean.pkl")
+dfs = io.import("tmp/clean.pkl")
 # exported_tab = dict() # output tables
 
 ```
 
+```python
 
-```{python}
+tabs = lb.stats.Tables(dfs["db_des"], vars_des=dfs["vd"])
+tabs.to_quarto()
+exported_tab.update(tabs.to_excel())
+
+```
+
+
+```python
 #| label: export-tables
 
-# lb.io.export_data(exported_tab, "outputs/tables.xlsx", index = True)
+io.export_data(exported_tab, "outputs/tables.xlsx", excel_kwargs =  {"autofilter": False})
+
 
 ```
 

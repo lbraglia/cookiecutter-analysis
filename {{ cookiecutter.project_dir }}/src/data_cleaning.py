@@ -126,7 +126,7 @@ df = dm.Coercer(df, df_coercions, mc).coerce()
 
 # # Export for analysis
 # # -------------------
-export_dict = {"db": df, "db_des": df[prj.des_vars]}
+export_dict = {"db": df, "db_des": df[prj.des_vars], "vd": vd}
 io.export_data(export_dict, "tmp/clean", ext=[".R", ".pkl"])
 if False:
     lb.r.view(export_dict)
