@@ -38,10 +38,10 @@ init:
 	@ $(call utils,project_init)
 
 add-data:
-	@ # do not use uv or nixos will require tkinter in each dir
+	# @ # if you use uv, nixos will require tkinter in each dir
 	@ echo "Need to choose if using redcap or generic imports"
-	# @ ${RUNPY} utils/add_data_generic
-	# @ ${RUNPY} utils/add_data_redcap
+	# @ ${UVRUNPY} utils/add_data_generic
+	# @ ${UVRUNPY} utils/add_data_redcap
 
 add-protocol:
 	@ # do not use uv here, assume the user has tkinter lib (which is std)
