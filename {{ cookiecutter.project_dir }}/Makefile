@@ -24,11 +24,7 @@ report: report-rnw
 view: view-report
 default: clean
 
-clean:
-	@ ${RM} \
-	*.tex *.aux *.pytxcode *.toc *.log pythontex-files-* \
-	*.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md \
-	*.nav *.snm *.Rout *_files
+
 # -----------------------------
 # Project setup and mantainance
 # -----------------------------
@@ -141,3 +137,23 @@ tg-slides:
 zip-results:
 	@ $(call utils,zip_results)
 
+# ---------------
+# Utils
+# ---------------
+clean:
+	@ ${RM} \
+	*.tex *.aux *.pytxcode *.toc *.log pythontex-files-* \
+	*.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md \
+	*.nav *.snm *.Rout *_files
+
+sysinfo:
+	@ echo "System informations"
+	@ echo "==================="
+	@ echo
+	@ echo "Standard install:"
+	@ echo
+	@ ${RUNPY} utils/sysinfo
+	@ echo
+	@ echo "UV install:"
+	@ echo	
+	@ ${UVRUNPY} utils/sysinfo

@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+import pylbmisc as lb
+
+if __name__ == "__main__":
+    lb.utils.sysinfo()
+    
