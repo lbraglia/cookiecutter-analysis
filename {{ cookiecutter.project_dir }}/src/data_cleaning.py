@@ -21,13 +21,13 @@ testing = interactive = lb.utils.is_interactive()
 try:
     raw_df
 except NameError:
-    df, raw_df, labels, vd = io.import_redcap(idvarprog=0)
+    df, vars_des, raw_df, raw_dict = io.import_redcap()
 
 if False:
     lb.r.view(df)
     os.system("make view-crf &")
     os.system("make view-protocol &")
-    pp(vd)
+    pp(vars_des)
 
     
 # Coercions/recoding
@@ -126,7 +126,7 @@ df = dm.Coercer(df, df_coercions, mc).coerce()
 
 # # Export for analysis
 # # -------------------
-export_dict = {"db": df, "db_des": df[prj.des_vars], "vd": vd}
+export_dict = {"db": df, "db_des": df[prj.des_vars], "vars_des": vars_des}
 io.export_data(export_dict, "tmp/clean", ext=[".R", ".pkl"])
 if False:
     lb.r.view(export_dict)
