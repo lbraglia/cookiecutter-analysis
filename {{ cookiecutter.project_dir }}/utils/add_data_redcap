@@ -18,8 +18,8 @@ def _setup_redcap_file(input_path, is_data_dictionary, do_encryption):
     gpg_ext = '.gpg' if do_encryption else ''
     outfile = data_dir / f"{input_path.name}{gpg_ext}"
     if is_data_dictionary:
-        symlink = data_dir / f"DATA_DICTIONARY.csv{gpg_ext}"
-        old_symlink = data_dir / f"OLD_DATA_DICTIONARY.csv{gpg_ext}"
+        symlink = data_dir / f"DICTIONARY.csv{gpg_ext}"
+        old_symlink = data_dir / f"OLD_DICTIONARY.csv{gpg_ext}"
     else:
         symlink = data_dir / f"DATA.csv{gpg_ext}"
         old_symlink = data_dir / f"OLD_DATA.csv{gpg_ext}"
