@@ -7,20 +7,19 @@ from tkinter.filedialog import askopenfilename
 # ------
 # PATHS
 # ------
-
 # project
 root = Path(".")
-data_dir      = root / "data"
+data_dir = root / "data"
 
-def _setup_redcap_file(input_path, is_label, do_encryption):
+def _setup_redcap_file(input_path, is_data_dictionary, do_encryption):
     """
-    Copia e crea i link per i file esportati da redcap (sia dati che labels)
+    Copia e crea i link per i file esportati da redcap (sia dati che data dictionary)
     """
     gpg_ext = '.gpg' if do_encryption else ''
     outfile = data_dir / f"{input_path.name}{gpg_ext}"
-    if is_label:
-        symlink = data_dir / f"LABELS.csv{gpg_ext}"
-        old_symlink = data_dir / f"OLD_LABELS.csv{gpg_ext}"
+    if is_data_dictionary:
+        symlink = data_dir / f"DATA_DICTIONARY.csv{gpg_ext}"
+        old_symlink = data_dir / f"OLD_DATA_DICTIONARY.csv{gpg_ext}"
     else:
         symlink = data_dir / f"DATA.csv{gpg_ext}"
         old_symlink = data_dir / f"OLD_DATA.csv{gpg_ext}"
@@ -40,13 +39,11 @@ def _setup_redcap_file(input_path, is_label, do_encryption):
 
 def import_redcap(do_encryption=True):
     """
-    Import latest redcap export (both DATA and LABELS) and set up proper
+    Import latest redcap export (both DATA and DATA DICTIONARY) and set up proper
     symlinks.
     """
     # tk-dialogbox
-    title = "Select the two csvs for DATA and LABELS exported from RedCAP" \
-        "'Data Exports, Reports, and Stats' -> 'Export Data'" \
-        " -> 'Download raw data and labesls'"
+    title = "Select the two csvs for raw DATA and DATA DICTIONARY exported from RedCAP"
     initialdir = "/tmp/"
     filetypes = [("Formati", ".csv")]
     fpaths = askopenfilename(
@@ -55,13 +52,13 @@ def import_redcap(do_encryption=True):
     )
     if len(fpaths) != 2:
         msg = "Stoppo: devono essere selezionati 2 csv," \
-            " uno per DATA e uno per LABELS."
+            " uno per DATA e uno per DATA DICTIONARY."
         raise ValueError(msg)
     fpaths = [Path(p) for p in fpaths]
-    labels = ["_DATA_LABELS_" in p.stem for p in fpaths]
+    data_dictionary = ["_DataDictionary_" in p.stem for p in fpaths]
     for i in range(len(fpaths)):
         _setup_redcap_file(input_path=fpaths[i],
-                           is_label=labels[i],
+                           is_data_dictionary=data_dictionary[i],
                            do_encryption=do_encryption)
 
 
