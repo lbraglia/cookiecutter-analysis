@@ -37,7 +37,7 @@ def import_generic_dataset(do_encryption=True):
         dfs = import_data(fpaths)
         # save as a single excel file
         outfile = data_dir / f"raw_dataset_{dataset_date}.xlsx{gpg_ext}"
-        export_data(x=dfs, path=outfile.absolute())
+        export_data(x=dfs, fpath=outfile.absolute())
         # add symlink
         symlink = data_dir / f"raw_dataset.xlsx{gpg_ext}"
         if symlink.exists():
