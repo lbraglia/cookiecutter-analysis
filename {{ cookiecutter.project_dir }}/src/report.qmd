@@ -27,12 +27,13 @@ jupyter: python3
 # import polars as pl
 # import matplotlib.pyplot as plt
 # import tableone
+import prjlib as prj
 import pylbmisc as lb
 from pylbmisc import io2 as io
 from pylbmisc.r import *
 from functools import partial
 testing = lb.utils.is_interactive()
-dfs = io.import("tmp/dfs.pkl")
+dfs = io.import_data("tmp/dfs.pkl")
 def Table(*args, **kwargs):
     return lb.stats.Table(*args, xdes=dfs["vd"][args[1]], ydes=dfs["vd"][args[2]], **kwargs)
 Tables = partial(lb.stats.Tables, vars_des=dfs["vd"])
@@ -43,9 +44,9 @@ Tables = partial(lb.stats.Tables, vars_des=dfs["vd"])
 ```{python}
 #| label: descrittive
 #| output: asis
-tabs = Tables(dfs["db_des"])
-tabs.to_quarto()
-exported_tab.update(tabs.to_excel())
+descr = Tables(dfs["db_des"])
+descr.to_quarto()
+exported_tab.update(descr.to_excel())
 
 ```
 
