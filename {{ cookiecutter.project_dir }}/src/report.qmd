@@ -44,7 +44,7 @@ Tables = partial(lb.stats.Tables, vars_des=dfs["vd"])
 ```{python}
 #| label: descrittive
 #| output: asis
-descr = Tables(dfs["db_des"])
+descr = Tables(dfs["db_des"], test=None)
 descr.to_quarto()
 exported_tab.update(descr.to_excel())
 
