@@ -30,8 +30,12 @@ jupyter: python3
 import pylbmisc as lb
 from pylbmisc import io2 as io
 from pylbmisc.r import *
+from functools import partial
 testing = lb.utils.is_interactive()
-dfs = io.import("tmp/clean.pkl")
+dfs = io.import("tmp/dfs.pkl")
+def Table(*args, **kwargs):
+    return lb.stats.Table(*args, xdes=dfs["vd"][args[1]], ydes=dfs["vd"][args[2]], **kwargs)
+Tables = partial(lb.stats.Tables, vars_des=dfs["vd"])
 # exported_tab = dict() # output tables
 
 ```
@@ -39,7 +43,7 @@ dfs = io.import("tmp/clean.pkl")
 ```{python}
 #| label: descrittive
 #| output: asis
-tabs = lb.stats.Tables(dfs["db_des"], vars_des=dfs["vd"])
+tabs = Tables(dfs["db_des"])
 tabs.to_quarto()
 exported_tab.update(tabs.to_excel())
 
@@ -49,17 +53,22 @@ exported_tab.update(tabs.to_excel())
 ```{python}
 #| label: export-tables
 
-io.export_data(exported_tab, "outputs/tables.xlsx", excel_kwargs =  {"autofilter": False})
+io.export_data(exported_tab, "outputs/tables.xlsx", excel_kwargs = {"autofilter": False})
 
 
 ```
 
 <!-- 
-- codice inline R funziona out of the box: `{r} 1 + 1`
-- codice inline python: analisi **`{python} "senza" if True else "con"`**
-  pazienti XYZ
-- come si vede sopra, il markdown fuori dal codice e` meglio
-- Citazione: inline [@moher2010consort]
+Vademecum
+
+- codice inline; markdown meglio fuori dal codice per 
+  - R : `{r} 1 + 1`
+  - python: `{python} "senza" if True else "con"`
+- citazione bibliografica: inline [@moher2010consort]
+- reference a tabelle: label con #tbl-utility, reference con @tbl-utility
+- reference a figure: chiamare il chunk dove si plotta la figura (la label), ad esempio
+  #| label: fig-costs-sum-by-section-barplot
+  dopodiché richiamarlo con @fig-costs-sum-by-section-barplot nel testo
 - LaTeX full formula: $$ \sum_{i=1}^n x_i $$
 - landscape come
 
@@ -68,6 +77,9 @@ qui e` in landscape
 :::
 qui non piu`
 
+- interruzione di pagina
+
+{{< pagebreak >}}
 
 -->
 

@@ -21,17 +21,20 @@ testing = interactive = lb.utils.is_interactive()
 try:
     raw_df
 except NameError:
-    df, vars_des, raw_df, raw_dict = io.import_redcap()
+    df, vd, raw_df, raw_dict = io.import_redcap()
+    io.export_data(
+        {"df": df, "raw_df": raw_df, "raw_dict": raw_dict}, "tmp/rawdata.xlsx"
+    )
 
 if False:
-    lb.r.view(df)
+    os.system("libreoffice tmp/rawdata.xlsx &")
     os.system("make view-crf &")
     os.system("make view-protocol &")
-    pp(vars_des)
+    pp(vd)
 
-    
-# Coercions/recoding
-# ------------------
+
+# Coercions/recoding for standard/old import
+# ------------------------------------------
 dm.dump_unique_values(raw_df)
 dm.names_list(raw_df)
 
@@ -40,41 +43,31 @@ dm.names_list(raw_df)
 livello_educativo = dm.enum_parser(["Media", "Superiore", "Laurea"])
 stato_civile = dm.enum_parser(
     levels=[0, 1, 2, 3, 4],
-    labels=["Sposata/Convivente",
-            "Divorziata/Separata/Vedova",
-            "Nubile",
-            "Sposata/Convivente",
-            "Divorziata/Separata/Vedova"]
+    labels=[
+        "Sposata/Convivente",
+        "Divorziata/Separata/Vedova",
+        "Nubile",
+        "Sposata/Convivente",
+        "Divorziata/Separata/Vedova",
+    ],
 )
 
 
 df_coercions = {
     # variabili che si vogliono tenere immodificate con keep_coerced_only in
-    # Coercer.coerce sotto identity    
+    # Coercer.coerce sotto identity
     # dm.identity: [],
-    dm.to_integer: [
-        
-    ],
-    dm.to_numeric: [
-        
-    ],
-    dm.to_noyes: [
-        
-    ],
-    dm.to_sex: [
-        
-    ],
-    dm.to_date: [
-        
-    ],
+    dm.to_integer: [],
+    dm.to_numeric: [],
+    dm.to_noyes: [],
+    dm.to_sex: [],
+    dm.to_date: [],
     # livello_educativo: ["titstu"],
     # stato_civile: ["civstat"]
 }
 
 mc = {
-    dm.to_multiple_choices: [
-        
-    ],
+    dm.to_multiple_choices: [],
 }
 
 # # single dataset
@@ -82,7 +75,6 @@ df = dm.Coercer(df, df_coercions, mc).coerce()
 # # multiple datasets
 # clean_df  = lb.dm2.Coercer(dfs["df"], df_coercions).coerce()
 # clean_df2 = lb.dm2.Coercer(dfs["df2"], df2_coercions).coerce()
-
 
 
 # # variable renaming and merging for multiple dataset
@@ -126,8 +118,9 @@ df = dm.Coercer(df, df_coercions, mc).coerce()
 
 # # Export for analysis
 # # -------------------
-export_dict = {"db": df, "db_des": df[prj.des_vars], "vars_des": vars_des}
-io.export_data(export_dict, "tmp/clean", ext=[".R", ".pkl"])
-if False:
-    lb.r.view(export_dict)
-
+export_dict = {
+    "db": df,  # final dataframe for analysis
+    "db_des": df[prj.des_vars],  # dataframe for descriptives
+    "vd": vd,  # dict for variables description
+}
+io.export_data(export_dict)

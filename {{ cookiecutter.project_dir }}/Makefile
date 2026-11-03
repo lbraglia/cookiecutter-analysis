@@ -5,7 +5,6 @@ RUNPY=python
 RUNR=R CMD BATCH --no-save --no-restore
 UVRUNPY=uv run python
 DOC_VIEWER=libreoffice --write --view
-XLS_VIEWER=libreoffice --calc --view
 
 define tg
 	winston_sends $1 group::lavoro
@@ -21,6 +20,7 @@ endef
 edit: edit-src
 compile: report
 report: report-rnw
+# report: report-docx
 view: view-report
 default: clean
 
@@ -68,24 +68,45 @@ edit-src:
 	@ ${EDITOR} src/* src/prjlib/src/prjlib/*.py src/data_cleaning.py & # src/report.Rnw &
 
 data-cleaning:
+	@ echo "======================="
+	@ echo "Data cleaning"          
+	@ echo "======================="
 	@ ${UVRUNPY} src/data_cleaning.py
 
 estimates-validation:
+	@ echo "======================="
+	@ echo "Estimates validation"          
+	@ echo "======================="
 	@ ${RUNR} src/estimates_validation.R
 
 report-rnw:
+	@ echo "======================="
+	@ echo "Compiling report.Rnw"          
+	@ echo "======================="
 	@ $(call utils,compile_rnw,src/report.Rnw) &
 
 report-docx:
+	@ echo "======================="
+	@ echo "Compiling report.qmd"          
+	@ echo "======================="
 	@ $(call utils,compile_qmd,src/report.qmd) && make view-report-docx &
 
 article:
+	@ echo "======================="
+	@ echo "Compiling article.qmd"          
+	@ echo "======================="
 	@ $(call utils,compile_qmd,src/article.qmd) && make view-article &
 
 appendices:
+	@ echo "======================="
+	@ echo "Compiling appendices.qmd"          
+	@ echo "======================="
 	@ $(call utils,compile_qmd,src/appendices.qmd) && make view-appendices &
 
 slides:
+	@ echo "======================="
+	@ echo "Compiling slides.Rnw"          
+	@ echo "======================="
 	@ $(call utils,compile_rnw,src/slides.Rnw)
 
 # ----------
@@ -144,7 +165,10 @@ clean:
 	@ ${RM} \
 	*.tex *.aux *.pytxcode *.toc *.log pythontex-files-* \
 	*.bbl *.bcf *.blg *.run.xml *.out *.qmd *.Rnw *.md \
-	*.nav *.snm *.Rout *_files
+	*.nav *.snm *.Rout *_files *.docx *.pdf
+
+cleanall: clean
+	${RM} tmp/*
 
 sysinfo:
 	@ echo "System informations"
