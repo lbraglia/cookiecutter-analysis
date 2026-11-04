@@ -4,7 +4,7 @@ RM=rm -rf
 RUNPY=python
 RUNR=R CMD BATCH --no-save --no-restore
 UVRUNPY=uv run python
-DOC_VIEWER=libreoffice --write --view
+DOC_VIEWER=libreoffice --writer --view
 
 define tg
 	winston_sends $1 group::lavoro
