@@ -65,27 +65,32 @@ Vademecum
 - codice inline; markdown meglio fuori dal codice per 
   - R : `{r} 1 + 1`
   - python: `{python} "senza" if True else "con"`
-- citazione bibliografica: inline [@moher2010consort]
-- nota a piè di pagina inline^[In Italy available data were]
-- nota a piè di pagina rimandata[^1]
-
-  [^1]: questa è la nota.
-
-- reference a tabelle: label con #tbl-utility, reference con @tbl-utility
-- reference a figure: chiamare il chunk dove si plotta la figura (la label), ad esempio
-  #| label: fig-costs-sum-by-section-barplot
-  dopodiché richiamarlo con @fig-costs-sum-by-section-barplot nel testo
+- citazione bibliografica: 
+  - con nome entro parentesi [@moher2010consort], 
+  - con solo anno entro parentesi @moher2010consort
+- nota a piè di pagina
+  - inline^[In Italy available data were]
+  - rimandata da qualche parte[^1]
+    [^1]: questa è la nota.
+- reference a:
+  - tabelle: label con #tbl-utility, reference con @tbl-utility
+  - figure: chiamare il chunk dove si plotta la figura (la label), ad esempio
+    #| label: fig-costs-sum-by-section-barplot
+    dopodiché richiamarlo con @fig-costs-sum-by-section-barplot nel testo
 - LaTeX full formula: $$ \sum_{i=1}^n x_i $$
 - landscape come
 
-::: {.landscape} 
-qui e` in landscape
-:::
-qui non piu`
+   ::: {.landscape} 
+   
+   qui e` in landscape
+   
+   :::
+   
+   qui non piu` in landscape
 
-- interruzione di pagina
+- interruzione di pagina: 
 
-{{< pagebreak >}}
+  {{< pagebreak >}}
 
 -->
 
