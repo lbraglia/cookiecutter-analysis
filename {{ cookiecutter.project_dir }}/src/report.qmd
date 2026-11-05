@@ -66,6 +66,11 @@ Vademecum
   - R : `{r} 1 + 1`
   - python: `{python} "senza" if True else "con"`
 - citazione bibliografica: inline [@moher2010consort]
+- nota a piè di pagina inline^[In Italy available data were]
+- nota a piè di pagina rimandata[^1]
+
+  [^1]: questa è la nota.
+
 - reference a tabelle: label con #tbl-utility, reference con @tbl-utility
 - reference a figure: chiamare il chunk dove si plotta la figura (la label), ad esempio
   #| label: fig-costs-sum-by-section-barplot
