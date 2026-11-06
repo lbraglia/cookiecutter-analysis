@@ -62,12 +62,20 @@ io.export_data(exported_tab, "outputs/tables.xlsx", excel_kwargs = {"autofilter"
 <!-- 
 Vademecum
 
+- elenchi
+  - bullet
+  1. numerato
+  2. numerato
 - codice inline; markdown meglio fuori dal codice per 
   - R : `{r} 1 + 1`
   - python: `{python} "senza" if True else "con"`
 - citazione bibliografica: 
   - con nome entro parentesi [@moher2010consort], 
   - con solo anno entro parentesi @moher2010consort
+- riportare citazioni di brani/scritti inline
+  > ei fu siccome immobile
+  > dato il mortal sospire
+  > stette la spoglia immemore
 - nota a piè di pagina
   - inline^[In Italy available data were]
   - rimandata da qualche parte[^1]
